@@ -201,7 +201,7 @@ export default function HistoryPage() {
                       <div className="flex-1">
                         <p className="font-semibold text-gray-900 text-sm">{o.serviceName as string} — {o.countryName as string}</p>
                         <p className="font-mono text-blue-600 font-bold text-sm mt-0.5">{o.phoneNumber as string}</p>
-                        {o.otpCode && <p className="text-green-600 font-bold font-mono text-lg mt-1">OTP: {o.otpCode as string}</p>}
+                        {o.otpCode ? <p className="text-green-600 font-bold font-mono text-lg mt-1">OTP: {o.otpCode as string}</p> : null}
                         <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                           <StatusBadge status={o.status as string} />
                           <span className="text-xs text-gray-500">{fmtDate(o.createdAt as string)}</span>
