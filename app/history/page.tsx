@@ -119,7 +119,7 @@ export default function HistoryPage() {
     if (d.success) toast.success('Deposit dibatalkan.'); else toast.error(d.message);
   };
 
-  const tabs: { id: Tab; label: string; icon: React.FC<{ size: number }> }[] = [
+  const tabs: { id: Tab; label: string; icon: React.ElementType }[] = [
     { id: 'premku-orders', label: 'Order Premku', icon: ShoppingBag },
     { id: 'nokos-orders', label: 'Order Nokos', icon: Phone },
     { id: 'premku-deposits', label: 'Deposit Premku', icon: CreditCard },
