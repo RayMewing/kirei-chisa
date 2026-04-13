@@ -1,8 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
-import Link from 'next/link';
-import { Send, Music2, MessageCircle, Radio, TerminalSquare, Crosshair } from 'lucide-react';
-
+import { Send, Music2, MessageCircle, Radio, TerminalSquare, Crosshair, Zap } from 'lucide-react';
 interface SocialLinks {
   telegram: string;
   tiktok: string;
