@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
     if (!product || !product.isActive)
       return NextResponse.json({ success: false, message: 'Produk tidak tersedia.' }, { status: 404 });
 
-    const availableIdx = product.accounts.findIndex(a => !a.sold);
+    const availableIdx = product.accounts.findIndex((a: any) => !a.sold);
     if (availableIdx === -1)
       return NextResponse.json({ success: false, message: 'Stok habis.' }, { status: 400 });
 
