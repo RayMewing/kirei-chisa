@@ -6,13 +6,15 @@ export async function GET() {
   try {
     const res = await fetch('https://www.rumahotp.io/api/v1/h2h/product', {
       headers: {
-        'x-apikey': process.env.RUMAHOTP_API_KEY!,
+        'x-apikey': process.env.RUMAHOTP_API_KEY || '',
         'Accept': 'application/json',
       },
-      next: { revalidate: 300 },
+      cache: 'no-store', // <-- KUNCI PERBAIKANNYA DI SINI
     });
+    
     const data = await res.json();
     if (!data.success) throw new Error('Failed to fetch PPOB products');
+    
     return NextResponse.json({ success: true, products: data.data });
   } catch (err) {
     console.error('PPOB products error:', err);
