@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import { CheckCircle } from 'lucide-react';
+import { CheckCircle, Receipt, TerminalSquare } from 'lucide-react';
 import { formatRupiah } from '@/lib/utils';
 
 type Tab = 'premku-deposits' | 'nokos-deposits' | 'premku-orders' | 'nokos-orders';
@@ -15,7 +15,7 @@ const fmtDate = (d: string) => new Date(d).toLocaleString('id-ID', { day: '2-dig
 
 const StatusBadge = ({ s }: { s: string }) => {
   const map: Record<string, string> = { success: 'badge-success', completed: 'badge-success', confirmed: 'badge-success', pending: 'badge-pending', processing: 'badge-pending', active: 'badge-active', failed: 'badge-failed', canceled: 'badge-failed', cancel: 'badge-failed', expired: 'badge-failed' };
-  return <span className={map[s] || 'badge-pending'}>{s}</span>;
+  return <span className={map[s] || 'badge-pending'}>{s.toUpperCase()}</span>;
 };
 
 export default function AdminTransactionsPage() {
@@ -31,7 +31,7 @@ export default function AdminTransactionsPage() {
   }, []);
 
   const confirmDeposit = async (id: string) => {
-    if (!confirm('Konfirmasi deposit ini dan tambahkan saldo ke user?')) return;
+    if (!confirm('Authorize this deposit and inject funds to user node?')) return;
     setConfirming(id);
     try {
       const res = await fetch('/api/admin/transactions', {
@@ -39,104 +39,184 @@ export default function AdminTransactionsPage() {
         body: JSON.stringify({ depositId: id, type: 'premku' }),
       });
       const d = await res.json();
-      if (d.success) { toast.success(d.message); setData(prev => ({ ...prev, premkuDeposits: prev.premkuDeposits.map(dep => dep._id === id ? { ...dep, status: 'confirmed', confirmedByAdmin: true } : dep) })); }
-      else toast.error(d.message);
+      if (d.success) { 
+        toast.success('Funds Injected Successfully.'); 
+        setData(prev => ({ ...prev, premkuDeposits: prev.premkuDeposits.map(dep => dep._id === id ? { ...dep, status: 'confirmed', confirmedByAdmin: true } : dep) })); 
+      }
+      else toast.error(`Sys_Error: ${d.message}`);
     } finally { setConfirming(null); }
   };
 
   const tabs = [
-    { id: 'premku-deposits' as Tab, label: 'Deposit Premku' },
-    { id: 'nokos-deposits' as Tab, label: 'Deposit Nokos' },
-    { id: 'premku-orders' as Tab, label: 'Order Premku' },
-    { id: 'nokos-orders' as Tab, label: 'Order Nokos' },
+    { id: 'premku-deposits' as Tab, label: 'Premku_Deposits' },
+    { id: 'nokos-deposits' as Tab, label: 'Nokos_Deposits' },
+    { id: 'premku-orders' as Tab, label: 'Premku_Orders' },
+    { id: 'nokos-orders' as Tab, label: 'Nokos_Orders' },
   ];
 
   return (
-    <div className="space-y-5">
-      <h1 className="text-lg font-bold text-gray-900">Transaksi</h1>
-      <div className="flex gap-2 flex-wrap">
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center gap-3 mb-6 border-b border-zinc-800 pb-4">
+        <Receipt className="text-red-500" size={28} />
+        <div>
+          <h1 className="text-2xl font-black text-white uppercase tracking-widest" style={{ textShadow: '2px 2px 0px #dc2626' }}>
+            Sys_Transactions
+          </h1>
+          <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest mt-1">{'>>'} Financial & Operational Logs</p>
+        </div>
+      </div>
+
+      {/* Tabs */}
+      <div className="flex gap-2 border-l-2 border-red-600 pl-3 bg-zinc-950/50 p-2 overflow-x-auto custom-scrollbar">
         {tabs.map(t => (
           <button key={t.id} onClick={() => setTab(t.id)}
-            className={`px-3.5 py-1.5 rounded-xl text-sm font-medium border transition-all ${tab === t.id ? 'bg-brand text-white border-brand' : 'bg-white text-gray-600 border-gray-200 hover:border-brand/40'}`}>
+            className={`px-4 py-2 text-xs font-mono font-bold uppercase tracking-widest transition-all whitespace-nowrap border ${
+              tab === t.id 
+                ? 'bg-red-950/30 text-red-500 border-red-500 shadow-[0_0_10px_rgba(220,38,38,0.2)]' 
+                : 'bg-zinc-900 text-zinc-500 border-zinc-800 hover:border-zinc-600 hover:text-zinc-300'
+            }`}>
             {t.label}
           </button>
         ))}
       </div>
 
-      {loading ? <div className="space-y-2">{[...Array(5)].map((_, i) => <div key={i} className="h-14 rounded-xl bg-gray-100 animate-pulse" />)}</div> : (
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="overflow-x-auto">
+      {loading ? (
+        <div className="space-y-3">{[...Array(5)].map((_, i) => <div key={i} className="h-16 bg-zinc-900/50 border border-zinc-800 animate-pulse" />)}</div>
+      ) : (
+        <div className="bg-zinc-900 border border-zinc-800 relative overflow-hidden">
+          {/* Scanlines & Tech Corners */}
+          <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-red-600 z-10 pointer-events-none"></div>
+          <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-red-600 z-10 pointer-events-none"></div>
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0)_50%,rgba(0,0,0,0.1)_50%)] bg-[length:100%_4px] pointer-events-none opacity-30 z-0" />
+          
+          <div className="overflow-x-auto relative z-10 custom-scrollbar">
+            
+            {/* PREMKU DEPOSITS */}
             {tab === 'premku-deposits' && (
-              <table className="w-full">
-                <thead><tr className="border-b border-gray-100"><th className="text-left text-xs font-semibold text-gray-500 px-4 py-3">User</th><th className="text-left text-xs font-semibold text-gray-500 px-4 py-3">Invoice</th><th className="text-left text-xs font-semibold text-gray-500 px-4 py-3">Nominal</th><th className="text-left text-xs font-semibold text-gray-500 px-4 py-3">Status</th><th className="text-left text-xs font-semibold text-gray-500 px-4 py-3">Tanggal</th><th className="text-left text-xs font-semibold text-gray-500 px-4 py-3">Aksi</th></tr></thead>
-                <tbody className="divide-y divide-gray-50">
+              <table className="w-full text-left">
+                <thead className="bg-zinc-950 border-b border-zinc-800">
+                  <tr>
+                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">User_Node</th>
+                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Invoice_ID</th>
+                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Amount</th>
+                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Sys_Status</th>
+                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Timestamp</th>
+                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-zinc-800/50">
                   {data.premkuDeposits.map(dep => (
-                    <tr key={dep._id} className="hover:bg-gray-50">
-                      <td className="px-4 py-3 text-sm font-medium text-gray-800">{dep.userId?.username}</td>
-                      <td className="px-4 py-3 text-xs font-mono text-gray-500">{dep.invoice}</td>
-                      <td className="px-4 py-3 text-sm font-semibold text-brand">{formatRupiah(dep.amount)}</td>
-                      <td className="px-4 py-3"><StatusBadge s={dep.status} /></td>
-                      <td className="px-4 py-3 text-xs text-gray-500">{fmtDate(dep.createdAt)}</td>
-                      <td className="px-4 py-3">
+                    <tr key={dep._id} className="hover:bg-zinc-800/30 transition-colors">
+                      <td className="px-5 py-4 text-sm font-bold text-white uppercase tracking-wide">{dep.userId?.username}</td>
+                      <td className="px-5 py-4 text-xs font-mono text-zinc-500">{dep.invoice}</td>
+                      <td className="px-5 py-4 text-sm font-black font-mono text-red-500 drop-shadow-[0_0_5px_rgba(220,38,38,0.5)]">{formatRupiah(dep.amount)}</td>
+                      <td className="px-5 py-4"><StatusBadge s={dep.status} /></td>
+                      <td className="px-5 py-4 text-[10px] font-mono text-zinc-400 uppercase">{fmtDate(dep.createdAt)}</td>
+                      <td className="px-5 py-4">
                         {dep.status === 'pending' && !dep.confirmedByAdmin && (
                           <button onClick={() => confirmDeposit(dep._id)} disabled={confirming === dep._id}
-                            className="flex items-center gap-1 text-xs bg-green-50 hover:bg-green-100 text-green-700 px-2.5 py-1.5 rounded-lg transition-colors">
-                            {confirming === dep._id ? <span className="spinner spinner-brand scale-75" /> : <><CheckCircle size={11} />Konfirmasi</>}
+                            className="flex items-center gap-2 text-[10px] font-mono font-bold uppercase tracking-widest bg-emerald-950/30 hover:bg-emerald-900/50 border border-emerald-900/50 text-emerald-500 px-3 py-2 transition-colors">
+                            {confirming === dep._id ? <span className="spinner border-emerald-500/30 border-t-emerald-500 scale-75" /> : <><CheckCircle size={12} /> Authorize</>}
                           </button>
                         )}
                       </td>
                     </tr>
                   ))}
+                  {data.premkuDeposits.length === 0 && (
+                    <tr><td colSpan={6} className="px-5 py-10 text-center text-xs font-mono text-zinc-600 uppercase tracking-widest">{'>>'} No_Data_Found</td></tr>
+                  )}
                 </tbody>
               </table>
             )}
+
+            {/* NOKOS DEPOSITS */}
             {tab === 'nokos-deposits' && (
-              <table className="w-full">
-                <thead><tr className="border-b border-gray-100"><th className="text-left text-xs font-semibold text-gray-500 px-4 py-3">User</th><th className="text-left text-xs font-semibold text-gray-500 px-4 py-3">Deposit ID</th><th className="text-left text-xs font-semibold text-gray-500 px-4 py-3">Diterima</th><th className="text-left text-xs font-semibold text-gray-500 px-4 py-3">Status</th><th className="text-left text-xs font-semibold text-gray-500 px-4 py-3">Tanggal</th></tr></thead>
-                <tbody className="divide-y divide-gray-50">
+              <table className="w-full text-left">
+                <thead className="bg-zinc-950 border-b border-zinc-800">
+                  <tr>
+                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">User_Node</th>
+                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Deposit_ID</th>
+                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Received</th>
+                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Sys_Status</th>
+                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Timestamp</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-zinc-800/50">
                   {data.nokosDeposits.map(dep => (
-                    <tr key={dep._id} className="hover:bg-gray-50">
-                      <td className="px-4 py-3 text-sm font-medium text-gray-800">{dep.userId?.username}</td>
-                      <td className="px-4 py-3 text-xs font-mono text-gray-500">{dep.depositId}</td>
-                      <td className="px-4 py-3 text-sm font-semibold text-blue-600">{formatRupiah(dep.diterima)}</td>
-                      <td className="px-4 py-3"><StatusBadge s={dep.status} /></td>
-                      <td className="px-4 py-3 text-xs text-gray-500">{fmtDate(dep.createdAt)}</td>
+                    <tr key={dep._id} className="hover:bg-zinc-800/30 transition-colors">
+                      <td className="px-5 py-4 text-sm font-bold text-white uppercase tracking-wide">{dep.userId?.username}</td>
+                      <td className="px-5 py-4 text-xs font-mono text-zinc-500">{dep.depositId}</td>
+                      <td className="px-5 py-4 text-sm font-black font-mono text-blue-500 drop-shadow-[0_0_5px_rgba(59,130,246,0.5)]">{formatRupiah(dep.diterima)}</td>
+                      <td className="px-5 py-4"><StatusBadge s={dep.status} /></td>
+                      <td className="px-5 py-4 text-[10px] font-mono text-zinc-400 uppercase">{fmtDate(dep.createdAt)}</td>
                     </tr>
                   ))}
+                  {data.nokosDeposits.length === 0 && (
+                    <tr><td colSpan={5} className="px-5 py-10 text-center text-xs font-mono text-zinc-600 uppercase tracking-widest">{'>>'} No_Data_Found</td></tr>
+                  )}
                 </tbody>
               </table>
             )}
+
+            {/* PREMKU ORDERS */}
             {tab === 'premku-orders' && (
-              <table className="w-full">
-                <thead><tr className="border-b border-gray-100"><th className="text-left text-xs font-semibold text-gray-500 px-4 py-3">User</th><th className="text-left text-xs font-semibold text-gray-500 px-4 py-3">Produk</th><th className="text-left text-xs font-semibold text-gray-500 px-4 py-3">Total</th><th className="text-left text-xs font-semibold text-gray-500 px-4 py-3">Status</th><th className="text-left text-xs font-semibold text-gray-500 px-4 py-3">Tanggal</th></tr></thead>
-                <tbody className="divide-y divide-gray-50">
+              <table className="w-full text-left">
+                <thead className="bg-zinc-950 border-b border-zinc-800">
+                  <tr>
+                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">User_Node</th>
+                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Module</th>
+                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Total_Cost</th>
+                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Sys_Status</th>
+                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Timestamp</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-zinc-800/50">
                   {data.premkuOrders.map(o => (
-                    <tr key={o._id} className="hover:bg-gray-50">
-                      <td className="px-4 py-3 text-sm font-medium text-gray-800">{o.userId?.username}</td>
-                      <td className="px-4 py-3 text-sm text-gray-700">{o.productName}</td>
-                      <td className="px-4 py-3 text-sm font-semibold text-brand">{formatRupiah(o.total)}</td>
-                      <td className="px-4 py-3"><StatusBadge s={o.status} /></td>
-                      <td className="px-4 py-3 text-xs text-gray-500">{fmtDate(o.createdAt)}</td>
+                    <tr key={o._id} className="hover:bg-zinc-800/30 transition-colors">
+                      <td className="px-5 py-4 text-sm font-bold text-white uppercase tracking-wide">{o.userId?.username}</td>
+                      <td className="px-5 py-4 text-xs font-mono text-zinc-300 uppercase">{o.productName}</td>
+                      <td className="px-5 py-4 text-sm font-black font-mono text-red-500 drop-shadow-[0_0_5px_rgba(220,38,38,0.5)]">{formatRupiah(o.total)}</td>
+                      <td className="px-5 py-4"><StatusBadge s={o.status} /></td>
+                      <td className="px-5 py-4 text-[10px] font-mono text-zinc-400 uppercase">{fmtDate(o.createdAt)}</td>
                     </tr>
                   ))}
+                  {data.premkuOrders.length === 0 && (
+                    <tr><td colSpan={5} className="px-5 py-10 text-center text-xs font-mono text-zinc-600 uppercase tracking-widest">{'>>'} No_Data_Found</td></tr>
+                  )}
                 </tbody>
               </table>
             )}
+
+            {/* NOKOS ORDERS */}
             {tab === 'nokos-orders' && (
-              <table className="w-full">
-                <thead><tr className="border-b border-gray-100"><th className="text-left text-xs font-semibold text-gray-500 px-4 py-3">User</th><th className="text-left text-xs font-semibold text-gray-500 px-4 py-3">Layanan</th><th className="text-left text-xs font-semibold text-gray-500 px-4 py-3">Nomor</th><th className="text-left text-xs font-semibold text-gray-500 px-4 py-3">OTP</th><th className="text-left text-xs font-semibold text-gray-500 px-4 py-3">Harga</th><th className="text-left text-xs font-semibold text-gray-500 px-4 py-3">Status</th><th className="text-left text-xs font-semibold text-gray-500 px-4 py-3">Tgl</th></tr></thead>
-                <tbody className="divide-y divide-gray-50">
+              <table className="w-full text-left">
+                <thead className="bg-zinc-950 border-b border-zinc-800">
+                  <tr>
+                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">User_Node</th>
+                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Service // Region</th>
+                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Virtual_No</th>
+                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Decrypted_Key</th>
+                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Cost</th>
+                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Sys_Status</th>
+                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Timestamp</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-zinc-800/50">
                   {data.nokosOrders.map(o => (
-                    <tr key={o._id} className="hover:bg-gray-50">
-                      <td className="px-4 py-3 text-sm font-medium text-gray-800">{o.userId?.username}</td>
-                      <td className="px-4 py-3 text-sm text-gray-700">{o.serviceName} — {o.countryName}</td>
-                      <td className="px-4 py-3 text-xs font-mono text-blue-600">{o.phoneNumber}</td>
-                      <td className="px-4 py-3 text-sm font-bold text-green-600">{o.otpCode || '—'}</td>
-                      <td className="px-4 py-3 text-sm font-semibold text-blue-600">{formatRupiah(o.price)}</td>
-                      <td className="px-4 py-3"><StatusBadge s={o.status} /></td>
-                      <td className="px-4 py-3 text-xs text-gray-500">{fmtDate(o.createdAt)}</td>
+                    <tr key={o._id} className="hover:bg-zinc-800/30 transition-colors">
+                      <td className="px-5 py-4 text-sm font-bold text-white uppercase tracking-wide">{o.userId?.username}</td>
+                      <td className="px-5 py-4 text-[10px] font-mono text-zinc-300 uppercase">{o.serviceName} <span className="text-zinc-600 mx-1">||</span> {o.countryName}</td>
+                      <td className="px-5 py-4 text-xs font-mono font-bold text-blue-400">{o.phoneNumber}</td>
+                      <td className="px-5 py-4 text-sm font-black font-mono text-emerald-500 drop-shadow-[0_0_5px_rgba(16,185,129,0.5)]">{o.otpCode || '—'}</td>
+                      <td className="px-5 py-4 text-sm font-black font-mono text-blue-500">{formatRupiah(o.price)}</td>
+                      <td className="px-5 py-4"><StatusBadge s={o.status} /></td>
+                      <td className="px-5 py-4 text-[10px] font-mono text-zinc-400 uppercase">{fmtDate(o.createdAt)}</td>
                     </tr>
                   ))}
+                  {data.nokosOrders.length === 0 && (
+                    <tr><td colSpan={7} className="px-5 py-10 text-center text-xs font-mono text-zinc-600 uppercase tracking-widest">{'>>'} No_Data_Found</td></tr>
+                  )}
                 </tbody>
               </table>
             )}
