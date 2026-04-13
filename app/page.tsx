@@ -7,103 +7,97 @@ import { ShoppingBag, Phone, Zap, Shield, Clock, Star, ArrowRight, Crosshair, Mo
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 relative overflow-hidden selection:bg-red-600 selection:text-white font-mono">
-      {/* Cyberpunk Grid Background */}
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(220,38,38,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(220,38,38,0.05)_1px,transparent_1px)] bg-[size:30px_30px] opacity-80 pointer-events-none -z-10" />
-
-      {/* Glowing Neon Accents - Red */}
+    <div className="min-h-screen bg-zinc-950 text-zinc-100 relative overflow-hidden selection:bg-red-600 selection:text-white font-sans">
+      {/* Glowing Neon Accents */}
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-red-600/10 rounded-full blur-[120px] pointer-events-none -z-10" />
       <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-red-600/10 rounded-full blur-[120px] pointer-events-none -z-10" />
 
       <Navbar />
       <main className="pt-24 pb-16">
-        {/* Hero Section */}
         <section className="max-w-5xl mx-auto px-4 sm:px-6">
           {/* System Header */}
           <div className="flex items-center justify-between mb-6 flex-wrap gap-4 relative z-10 border-b border-zinc-800 pb-4">
             <div className="flex items-center gap-3">
               <span className="w-3 h-3 bg-red-500 animate-pulse shadow-[0_0_10px_rgba(239,68,68,0.8)]"></span>
-              <h2 className="text-xs font-bold text-red-500 tracking-[0.2em] uppercase">
-                Sys.Online // Kirei_Chisa // V1.0.1
+              <h2 className="text-xs font-mono font-bold text-red-500 tracking-[0.2em] uppercase">
+                Sys.Online // Kirei_Chisa // V1.0.2
               </h2>
             </div>
             <ServerStatus />
           </div>
 
-          {/* MAIN Hero Container (16:9 aspect) */}
-          <div className="relative w-full aspect-video overflow-hidden mb-12 border-l-4 border-red-600 bg-zinc-900 shadow-[0_0_40px_rgba(220,38,38,0.2)]">
-            {/* Tech Corners Decorations */}
+          {/* MAIN Hero Container - Fixed height for Mobile */}
+          <div className="relative w-full min-h-[480px] sm:min-h-[500px] py-12 flex flex-col justify-center overflow-hidden mb-12 border-l-4 border-red-600 bg-zinc-900 shadow-[0_0_40px_rgba(220,38,38,0.2)]">
+            {/* Tech Corners */}
             <div className="absolute top-0 right-0 w-10 h-10 border-t-2 border-r-2 border-white/40 z-30 pointer-events-none"></div>
             <div className="absolute bottom-0 left-0 w-10 h-10 border-b-2 border-l-2 border-white/40 z-30 pointer-events-none"></div>
 
-            {/* Main Background Cyberpunk Video */}
-            {/* Ganti src ini dengan video background cyberpunk utama kamu, misal: /assets/cyberpunk-bg.mp4 */}
+            {/* Background Video */}
             <video
               autoPlay
               loop
               muted
               playsInline
-              className="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-luminosity z-0"
-              src="/assets/kirei.mp4" 
+              className="absolute inset-0 w-full h-full object-cover opacity-50 mix-blend-luminosity z-0"
+              src="/assets/dummy-video.mp4" 
             />
             
-            {/* Main Overlay Content */}
-            {/* Centered content with padding */}
-            <div className="absolute inset-0 bg-gradient-to-r from-zinc-950/95 via-zinc-900/60 to-zinc-950/70 z-10 flex flex-col items-center justify-center text-center p-6 sm:p-10 md:p-16">
+            {/* Content Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-r from-zinc-950/95 via-zinc-900/70 to-zinc-950/80 z-10" />
+            
+            <div className="relative z-20 flex flex-col items-center justify-center text-center px-4 sm:px-10 max-w-3xl mx-auto">
               
-              {/* --- VIDEO INSIDE TEXT TITLE --- */}
-              <div className="relative title-video-wrapper w-full h-auto mx-auto mb-6 flex items-center justify-center overflow-hidden border-b-2 border-dashed border-red-900/40 pb-4">
+              {/* VIDEO INSIDE TEXT TRICK */}
+              <div className="relative w-full flex flex-col items-center justify-center mb-6 border-b border-dashed border-red-900/50 pb-6">
                 
-                {/* 1. Video khusus untuk di dalam text (misal video glitch abstrak) */}
-                {/* Ganti src ini dengan video glitch khusus untuk text, misal: /assets/text-glitch.mp4 */}
-                <video
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  className="absolute inset-0 w-full h-full object-cover z-0 opacity-100"
-                  src="/assets/dummy-video.mp4" 
-                />
-                
-                {/* 2. Red Overlay filter for the text video */}
-                <div className="absolute inset-0 bg-red-950/30 z-10" />
+                {/* Video text mask element */}
+                <div className="relative overflow-hidden w-full h-24 sm:h-32 md:h-40 flex items-center justify-center">
+                  <video
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="absolute inset-0 w-full h-full object-cover opacity-80"
+                    src="https://whqlpszmydukjwyyexnf.supabase.co/storage/v1/object/public/media-hosting/ray-1776107268834.mp4" 
+                  />
+                  <div className="absolute inset-0 bg-red-950/40" />
+                  
+                  {/* Text that acts as a mask (mix-blend-multiply on white BG is standard, but mix-blend-difference works cool on dark) */}
+                  <h1 className="relative z-10 font-black text-white uppercase tracking-tighter leading-none mix-blend-difference text-4xl sm:text-6xl md:text-7xl lg:text-[5rem] drop-shadow-[2px_2px_0px_rgba(220,38,38,0.8)] whitespace-nowrap">
+                    WELCOME TO
+                  </h1>
+                </div>
 
-                {/* 3. The Text Element - White with mix-blend-difference */}
-                {/* Responsif text sizes: text-3xl (mobile) -> text-7xl (desktop) */}
-                <h1 className="relative z-20 font-black text-white uppercase tracking-tighter leading-none p-2 mix-blend-difference`
-                    text-3xl sm:text-5xl md:text-6xl lg:text-7xl
-                    drop-shadow-[2px_2px_0px_#881337]">
-                  Welcome to
-                  <br />
-                  <span className="text-red-500 mix-blend-difference">Kirei Chisa</span>
-                </h1>
+                <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-red-500 uppercase tracking-widest mt-2" style={{ textShadow: '2px 2px 0px #450a0a' }}>
+                  Kirei Chisa
+                </h2>
               </div>
-              {/* --- END VIDEO INSIDE TEXT --- */}
 
-              <p className="text-zinc-300 text-xs sm:text-sm max-w-lg font-mono mb-8 border-l-2 border-red-600 pl-4 bg-zinc-950/50 p-3 backdrop-blur-sm shadow-md">
-                [DATA_LINK_ESTABLISHED] <br/><br/>
+              <p className="text-zinc-300 text-xs sm:text-sm font-mono mb-8 border-l-2 border-red-600 pl-4 bg-zinc-950/60 p-4 backdrop-blur-md shadow-lg text-left max-w-lg w-full">
+                <span className="text-red-500 font-bold">[{'>'} DATA_LINK_ESTABLISHED]</span> <br/><br/>
                 Platform jual beli akun premium, OTP virtual, dan Top-Up PPOB terlengkap. 
                 Transaksi cepat, aman, 24/7 otomatis.
               </p>
               
-              <Link href="#layanan" className="w-fit px-8 py-3 bg-red-600 hover:bg-red-500 text-white font-bold font-mono tracking-widest uppercase transition-all duration-200 border border-red-400 hover:border-white shadow-[0_0_20px_rgba(220,38,38,0.6)] flex items-center gap-3 group">
+              <Link href="#layanan" className="btn-primary group">
                 <MonitorPlay size={18} /> Initialize <ArrowRight size={18} className="group-hover:translate-x-2 transition-transform" />
               </Link>
             </div>
             
-            {/* Scanlines Overlay effect */}
-            <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0)_50%,rgba(0,0,0,0.1)_50%)] bg-[length:100%_4px] z-20 pointer-events-none opacity-50" />
+            {/* Scanlines Overlay */}
+            <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0)_50%,rgba(0,0,0,0.1)_50%)] bg-[length:100%_4px] z-30 pointer-events-none opacity-50" />
           </div>
 
           <BannerSlider />
         </section>
 
+        {/* ... (Bagian Layanan & Features di bawahnya persis sama kayak kode sebelumnya) ... */}
         {/* Services */}
         <section id="layanan" className="max-w-5xl mx-auto px-4 sm:px-6 py-16">
           <div className="mb-10 border-b-2 border-zinc-800 pb-4 flex items-end justify-between">
             <div>
               <h2 className="text-3xl font-black text-white uppercase tracking-tight">Database Layanan</h2>
-              <p className="text-red-500 font-mono text-xs mt-1">{'>>'} Select your module_</p>
+              <p className="text-red-500 font-mono text-xs mt-1">{'>'}{'>'} Select your module_</p>
             </div>
             <Crosshair className="text-red-600/50 animate-[spin_6s_linear_infinite]" size={32} />
           </div>
