@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import CustomProduct from '@/lib/models/CustomProduct';
 import Settings from '@/lib/models/Settings';
+import { extractCategory } from '@/lib/utils'; // WAJIB IMPORT INI BUAT KATEGORI API
 
 export const dynamic = 'force-dynamic';
 
@@ -20,8 +21,8 @@ export async function GET() {
         price: p.price,
         status: stock > 0 ? 'available' : 'unavailable',
         stock: stock,
-        image: p.imageBase64,
-        category: p.category || 'Lainnya',
+        image: p.imageBase64 || '', // Gambar dari DB Custom
+        category: p.category || extractCategory(p.name), // Kategori dari DB Admin
         isCustom: true // Penanda penting buat frontend
       };
     });
@@ -44,18 +45,18 @@ export async function GET() {
       premkuProds = data.products.map((p: any) => ({
         id: p.id,
         name: p.name,
-        description: '',
+        description: p.description || '',
         // Pakai harga admin kalau diset, kalau gak pakai harga asli
         price: customPrices[String(p.id)] ? Number(customPrices[String(p.id)]) : Number(p.price), 
         status: p.status,
         stock: p.status === 'available' ? 999 : 0,
-        image: '',
-        category: 'Premku API',
+        image: p.image || '', // FIX: Panggil gambar asli dari API Premku
+        category: extractCategory(p.name), // FIX: Otomatis bikin kategori dari nama
         isCustom: false
       }));
     }
 
-    // 4. Gabungin keduanya
+    // 4. Gabungin Keduanya
     const allProducts = [...mappedCustom, ...premkuProds];
 
     return NextResponse.json({ success: true, products: allProducts });
