@@ -27,7 +27,7 @@ export default function HomePage() {
         {/* Services */}
         <section className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
           <h2 className="text-lg font-bold text-gray-800 mb-4">Layanan Kami</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {/* Premku Card */}
             <Link href="/premku" className="group card hover:border-brand/30 hover:shadow-md transition-all duration-200">
               <div className="flex items-start gap-4">
@@ -65,6 +65,27 @@ export default function HomePage() {
                   </p>
                   <span className="inline-flex items-center gap-1 mt-3 text-blue-600 text-sm font-semibold group-hover:gap-2 transition-all">
                     Pesan nomor →
+                  </span>
+                </div>
+              </div>
+            </Link>
+
+            {/* PPOB Card */}
+            <Link href="/ppob" className="group card hover:border-purple-200 hover:shadow-md transition-all duration-200">
+              <div className="flex items-start gap-4">
+                <div className="w-14 h-14 bg-purple-50 rounded-2xl flex items-center justify-center group-hover:bg-purple-100 transition-colors flex-shrink-0">
+                  <Zap size={26} className="text-purple-600" />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h3 className="font-bold text-gray-900 text-lg">PPOB</h3>
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-purple-50 text-purple-600">Top Up</span>
+                  </div>
+                  <p className="text-sm text-gray-500 leading-relaxed">
+                    Top up game (Free Fire, ML, PUBG), isi saldo e-wallet (DANA, OVO, GoPay), dan pulsa semua operator.
+                  </p>
+                  <span className="inline-flex items-center gap-1 mt-3 text-purple-600 text-sm font-semibold group-hover:gap-2 transition-all">
+                    Lihat layanan →
                   </span>
                 </div>
               </div>

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   Home, ShoppingBag, Phone, LayoutDashboard, History,
-  CreditCard, LogOut, Menu, X, ChevronDown, User
+  CreditCard, LogOut, Menu, X, ChevronDown, User, Zap
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -44,6 +44,7 @@ export default function Navbar() {
     { href: '/', label: 'Beranda', icon: Home },
     { href: '/premku', label: 'Premku', icon: ShoppingBag },
     { href: '/nokos', label: 'Nokos OTP', icon: Phone },
+    { href: '/ppob', label: 'PPOB', icon: Zap },
   ];
 
   const userLinks = [
