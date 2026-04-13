@@ -6,7 +6,7 @@ import toast from 'react-hot-toast';
 import Image from 'next/image';
 import {
   Zap, Search, RefreshCw, X, CheckCircle, XCircle,
-  Gamepad2, Wallet, ChevronRight, Copy, AlertCircle,
+  Gamepad2, Wallet, ChevronRight, Copy, AlertCircle, Crosshair, TerminalSquare
 } from 'lucide-react';
 import { formatRupiah } from '@/lib/utils';
 
@@ -48,15 +48,15 @@ function getCategoryTab(category: string): CategoryTab {
 }
 
 const categoryIcons: Record<CategoryTab, React.ReactNode> = {
-  semua: <Zap size={14} />,
+  semua: <Crosshair size={14} />,
   game: <Gamepad2 size={14} />,
   ewallet: <Wallet size={14} />,
-  pulsa: <span className="text-xs">📶</span>,
-  lainnya: <span className="text-xs">⚡</span>,
+  pulsa: <span className="text-xs font-mono">📶</span>,
+  lainnya: <span className="text-xs font-mono">⚡</span>,
 };
 
 const categoryLabels: Record<CategoryTab, string> = {
-  semua: 'Semua', game: 'Game', ewallet: 'E-Wallet', pulsa: 'Pulsa & Data', lainnya: 'Lainnya',
+  semua: 'ALL_NODES', game: 'GAME', ewallet: 'E-WALLET', pulsa: 'CELLULAR', lainnya: 'OTHERS',
 };
 
 export default function PpobPage() {
@@ -83,12 +83,10 @@ export default function PpobPage() {
       if (data.success) {
         setProducts(data.products);
       } else {
-        toast.error(data.message || 'Gagal memuat produk PPOB');
-        console.error('PPOB page error:', data.message);
+        toast.error(data.message || 'Error: PPOB module offline');
       }
     } catch (err) {
-      console.error('PPOB fetch error:', err);
-      toast.error('Gagal terhubung ke server.');
+      toast.error('System Error: Connection failed.');
     } finally {
       setLoading(false);
     }
@@ -126,7 +124,7 @@ export default function PpobPage() {
   const needsCheck = isGame || isEwallet;
 
   const checkTarget = async () => {
-    if (!selected || !target.trim()) { toast.error('Masukkan nomor/ID tujuan dulu.'); return; }
+    if (!selected || !target.trim()) { toast.error('Require Target ID/Number.'); return; }
     setChecking(true);
     setTargetInfo(null);
     try {
@@ -139,18 +137,18 @@ export default function PpobPage() {
       const data = await res.json();
       if (data.success && data.data?.status === 'valid') {
         setTargetInfo({ name: data.data.account_name, status: 'valid' });
-        toast.success(`Akun valid: ${data.data.account_name}`);
+        toast.success(`Target Verified: ${data.data.account_name}`);
       } else {
         setTargetInfo({ name: '', status: 'invalid' });
-        toast.error('Nomor/ID tidak valid atau tidak ditemukan.');
+        toast.error('Target invalid or not found.');
       }
     } finally { setChecking(false); }
   };
 
   const handleOrder = async () => {
     if (!selected || !target.trim()) return;
-    if (needsCheck && !targetInfo) { toast.error('Cek nomor tujuan dulu sebelum beli.'); return; }
-    if (needsCheck && targetInfo?.status !== 'valid') { toast.error('Nomor tujuan tidak valid.'); return; }
+    if (needsCheck && !targetInfo) { toast.error('Verification required before execution.'); return; }
+    if (needsCheck && targetInfo?.status !== 'valid') { toast.error('Invalid target node.'); return; }
 
     setOrdering(true);
     try {
@@ -170,10 +168,10 @@ export default function PpobPage() {
       });
       const data = await res.json();
       if (!data.success) {
-        if (res.status === 401) { toast.error('Login dulu ya!'); return; }
+        if (res.status === 401) { toast.error('System Auth Failed: Login Required'); return; }
         toast.error(data.message); return;
       }
-      toast.success('Transaksi berhasil dibuat!');
+      toast.success('Sequence executed successfully!');
       setOrderResult({
         transaksiId: data.order.transaksiId,
         productName: data.order.productName,
@@ -201,92 +199,105 @@ export default function PpobPage() {
       const data = await res.json();
       if (data.success) {
         setOrderResult(data.order);
-        if (data.order.status === 'success') toast.success('Transaksi berhasil!');
-        else if (data.order.status === 'failed') toast.error('Transaksi gagal. Saldo dikembalikan jika refund.');
-        else toast(`Status: ${data.order.status}`);
+        if (data.order.status === 'success') toast.success('Execution Complete!');
+        else if (data.order.status === 'failed') toast.error('Execution Failed. Funds restored if refunded.');
+        else toast(`System Status: ${data.order.status.toUpperCase()}`);
       }
     } finally { setCheckingStatus(false); }
   };
 
   const statusBadge = (status: string) => {
-    if (status === 'success') return <span className="badge-success"><CheckCircle size={11} />Sukses</span>;
-    if (status === 'failed' || status === 'canceled') return <span className="badge-failed"><XCircle size={11} />{status}</span>;
-    return <span className="badge-pending"><RefreshCw size={11} className="animate-spin" />{status}</span>;
+    if (status === 'success') return <span className="badge-success"><CheckCircle size={11} />SUCCESS</span>;
+    if (status === 'failed' || status === 'canceled') return <span className="badge-failed"><XCircle size={11} />{status.toUpperCase()}</span>;
+    return <span className="badge-pending"><RefreshCw size={11} className="animate-spin" />{status.toUpperCase()}</span>;
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-zinc-950 text-zinc-100 relative overflow-hidden font-sans selection:bg-red-600 selection:text-white">
+      {/* Cyber Background Glow */}
+      <div className="absolute top-0 right-0 w-full h-96 bg-red-600/5 blur-[150px] pointer-events-none -z-10" />
+
       <Navbar />
-      <main className="pt-16 max-w-5xl mx-auto px-4 sm:px-6 py-8">
-        {/* Header */}
-        <div className="mb-6 flex items-center gap-2">
-          <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-700 rounded-xl flex items-center justify-center">
-            <Zap size={20} className="text-white" />
+      <main className="pt-24 max-w-5xl mx-auto px-4 sm:px-6 py-8 relative z-10">
+        
+        {/* Header Title */}
+        <div className="mb-8 border-b border-zinc-800 pb-4">
+          <div className="flex items-center gap-3 mb-1">
+            <Zap className="text-red-500 animate-pulse" size={28} />
+            <h1 className="text-3xl font-black text-white uppercase tracking-tight" style={{ textShadow: '2px 2px 0px #dc2626' }}>
+              PPOB_Node
+            </h1>
           </div>
-          <div>
-            <h1 className="text-xl font-bold text-gray-900">PPOB — Bayar & Top Up</h1>
-            <p className="text-sm text-gray-500">Game, E-Wallet, Pulsa • Dibayar pakai saldo Nokos</p>
-          </div>
+          <p className="text-red-500 font-mono text-xs pl-10">{'>>'} Top-Up Gateway // Billed to Nokos_Credits</p>
         </div>
 
         {/* Order Result Panel */}
         {orderResult && (
-          <div className={`card mb-6 border-2 ${
-            orderResult.status === 'success' ? 'border-green-200 bg-green-50' :
-            orderResult.status === 'failed' || orderResult.status === 'canceled' ? 'border-red-200 bg-red-50' :
-            'border-purple-200 bg-purple-50'
+          <div className={`mb-8 border-l-4 p-5 relative overflow-hidden shadow-lg ${
+            orderResult.status === 'success' ? 'border-emerald-500 bg-emerald-950/20 shadow-emerald-900/20' :
+            orderResult.status === 'failed' || orderResult.status === 'canceled' ? 'border-red-500 bg-red-950/20 shadow-red-900/20' :
+            'border-amber-500 bg-amber-950/20 shadow-amber-900/20'
           }`}>
-            <div className="flex items-center justify-between mb-3">
-              <span className="font-bold text-gray-900 text-sm">Hasil Transaksi</span>
-              <button onClick={() => setOrderResult(null)} className="text-gray-400 hover:text-gray-600"><X size={16} /></button>
-            </div>
-            <div className="grid grid-cols-2 gap-2 text-sm mb-3">
-              <div><span className="text-gray-500 text-xs">Produk</span><p className="font-semibold text-gray-900">{orderResult.productNote || orderResult.productName}</p></div>
-              <div><span className="text-gray-500 text-xs">Tujuan</span><p className="font-mono font-semibold">{orderResult.target}</p></div>
-              {orderResult.targetName && <div><span className="text-gray-500 text-xs">Nama</span><p className="font-medium">{orderResult.targetName}</p></div>}
-              <div><span className="text-gray-500 text-xs">Harga</span><p className="font-bold text-purple-600">{formatRupiah(orderResult.price)}</p></div>
-              <div><span className="text-gray-500 text-xs">Status</span><div className="mt-0.5">{statusBadge(orderResult.status)}</div></div>
-              {orderResult.sn && (
-                <div className="col-span-2">
-                  <span className="text-gray-500 text-xs">Serial Number</span>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <p className="font-mono text-xs text-green-700 bg-green-100 px-2 py-1 rounded-lg flex-1 truncate">{orderResult.sn}</p>
-                    <button onClick={() => { navigator.clipboard.writeText(orderResult.sn!); toast.success('SN disalin!'); }}>
-                      <Copy size={13} className="text-gray-400 hover:text-green-600" />
-                    </button>
+            <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0)_50%,rgba(0,0,0,0.1)_50%)] bg-[length:100%_4px] pointer-events-none opacity-30" />
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-4 border-b border-zinc-800/50 pb-3">
+                <span className="font-black font-mono uppercase tracking-widest text-white text-sm">Execution_Log</span>
+                <button onClick={() => setOrderResult(null)} className="text-zinc-500 hover:text-red-500 transition-colors"><X size={18} /></button>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4 text-xs font-mono mb-5">
+                <div><span className="text-zinc-500 block mb-1 uppercase">Module:</span><p className="font-bold text-white uppercase">{orderResult.productNote || orderResult.productName}</p></div>
+                <div><span className="text-zinc-500 block mb-1 uppercase">Target:</span><p className="font-bold text-red-400 text-sm tracking-widest">{orderResult.target}</p></div>
+                {orderResult.targetName && <div><span className="text-zinc-500 block mb-1 uppercase">Verified_ID:</span><p className="text-white uppercase">{orderResult.targetName}</p></div>}
+                <div><span className="text-zinc-500 block mb-1 uppercase">Cost:</span><p className="font-bold text-red-500 text-sm drop-shadow-[0_0_5px_rgba(220,38,38,0.5)]">{formatRupiah(orderResult.price)}</p></div>
+                <div><span className="text-zinc-500 block mb-1 uppercase">Sys_Status:</span><div className="mt-1">{statusBadge(orderResult.status)}</div></div>
+                
+                {orderResult.sn && (
+                  <div className="col-span-2">
+                    <span className="text-zinc-500 block mb-1 uppercase">Serial_Number:</span>
+                    <div className="flex items-center justify-between bg-zinc-950 border border-emerald-900/50 px-3 py-2">
+                      <p className="font-mono text-xs text-emerald-400 tracking-widest truncate">{orderResult.sn}</p>
+                      <button onClick={() => { navigator.clipboard.writeText(orderResult.sn!); toast.success('SN Copied!'); }} className="text-emerald-600 hover:text-emerald-400 transition-colors">
+                        <Copy size={14} />
+                      </button>
+                    </div>
                   </div>
-                </div>
-              )}
-              {orderResult.refund && (
-                <div className="col-span-2">
-                  <span className="inline-flex items-center gap-1 text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded-full">
-                    <CheckCircle size={10} /> Saldo sudah dikembalikan
-                  </span>
-                </div>
-              )}
+                )}
+                {orderResult.refund && (
+                  <div className="col-span-2">
+                    <span className="inline-flex items-center gap-1.5 text-[10px] font-mono text-emerald-500 uppercase tracking-widest border border-emerald-900/50 bg-emerald-950/30 px-2 py-1">
+                      <CheckCircle size={10} /> Funds_Restored_To_Balance
+                    </span>
+                  </div>
+                )}
+              </div>
+              
+              <button onClick={handleCheckStatus} disabled={checkingStatus || orderResult.status === 'success'}
+                className="btn-secondary w-full py-3 text-xs flex items-center justify-center gap-2 group relative overflow-hidden">
+                <div className="absolute inset-0 w-full h-full bg-white/5 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out"></div>
+                {checkingStatus ? <span className="spinner border-red-500/30 border-t-red-500" /> : <><RefreshCw size={14} /> Ping_Status</>}
+              </button>
             </div>
-            <button onClick={handleCheckStatus} disabled={checkingStatus || orderResult.status === 'success'}
-              className="btn-secondary w-full py-2 text-sm">
-              {checkingStatus ? <span className="spinner spinner-brand" /> : <><RefreshCw size={13} />Cek Status Transaksi</>}
-            </button>
           </div>
         )}
 
         {/* Search */}
-        <div className="relative mb-4">
-          <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-          <input className="input pl-9 bg-white" placeholder="Cari produk (mis: Free Fire, DANA, Telkomsel...)"
+        <div className="relative mb-6">
+          <div className="absolute inset-0 bg-red-600/20 blur-xl opacity-50 -z-10"></div>
+          <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-red-500/70" />
+          <input className="input pl-11 bg-zinc-950/80 backdrop-blur-sm border-zinc-800/80 focus:border-red-600 focus:shadow-[0_0_15px_rgba(220,38,38,0.2)] text-white font-mono" 
+            placeholder="Search module (e.g., Free Fire, DANA)..."
             value={search} onChange={e => { setSearch(e.target.value); setActiveTab('semua'); setActiveBrand('semua'); }} />
         </div>
 
         {/* Category Tabs */}
-        <div className="flex gap-2 flex-wrap mb-3">
+        <div className="flex gap-2 flex-wrap mb-4 border-l-2 border-red-600 pl-3 bg-zinc-950/50 p-2">
           {availableTabs.map(tab => (
             <button key={tab} onClick={() => { setActiveTab(tab); setActiveBrand('semua'); }}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-sm font-medium transition-all border ${
+              className={`flex items-center gap-2 px-3 py-1.5 font-mono text-xs uppercase tracking-wider transition-all border ${
                 activeTab === tab
-                  ? 'bg-purple-600 text-white border-purple-600 shadow-sm'
-                  : 'bg-white text-gray-600 border-gray-200 hover:border-purple-300 hover:text-purple-600'
+                  ? 'bg-red-600/20 text-red-500 border-red-500/50 shadow-[0_0_10px_rgba(220,38,38,0.2)] font-bold'
+                  : 'bg-zinc-900 text-zinc-400 border-zinc-800 hover:border-red-500/30 hover:text-red-400'
               }`}>
               {categoryIcons[tab]}{categoryLabels[tab]}
             </button>
@@ -295,14 +306,14 @@ export default function PpobPage() {
 
         {/* Brand sub-filter */}
         {activeTab !== 'semua' && brandsInTab.length > 1 && (
-          <div className="flex gap-2 flex-wrap mb-4">
+          <div className="flex gap-2 flex-wrap mb-6 pl-4 border-l border-zinc-800">
             <button onClick={() => setActiveBrand('semua')}
-              className={`px-3 py-1 rounded-full text-xs font-medium border transition-all ${activeBrand === 'semua' ? 'bg-gray-800 text-white border-gray-800' : 'bg-white text-gray-500 border-gray-200 hover:border-gray-400'}`}>
-              Semua
+              className={`px-3 py-1 font-mono text-[10px] uppercase tracking-widest border transition-all ${activeBrand === 'semua' ? 'bg-zinc-800 text-white border-zinc-600' : 'bg-zinc-950 text-zinc-500 border-zinc-800 hover:border-zinc-600 hover:text-zinc-300'}`}>
+              ALL
             </button>
             {brandsInTab.map(brand => (
               <button key={brand} onClick={() => setActiveBrand(brand)}
-                className={`px-3 py-1 rounded-full text-xs font-medium border transition-all capitalize ${activeBrand === brand ? 'bg-gray-800 text-white border-gray-800' : 'bg-white text-gray-500 border-gray-200 hover:border-gray-400'}`}>
+                className={`px-3 py-1 font-mono text-[10px] uppercase tracking-widest border transition-all ${activeBrand === brand ? 'bg-zinc-800 text-white border-zinc-600' : 'bg-zinc-950 text-zinc-500 border-zinc-800 hover:border-zinc-600 hover:text-zinc-300'}`}>
                 {getBrandLabel(brand)}
               </button>
             ))}
@@ -312,47 +323,51 @@ export default function PpobPage() {
         {/* Products */}
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[...Array(9)].map((_, i) => <div key={i} className="card h-36 animate-pulse bg-gray-100" />)}
+            {[...Array(9)].map((_, i) => <div key={i} className="card-product h-32 animate-pulse bg-zinc-900/50 border-zinc-800" />)}
           </div>
         ) : Object.keys(grouped).length === 0 ? (
-          <div className="text-center py-16 text-gray-400">
-            <Zap size={36} className="mx-auto mb-3 opacity-30" />
-            <p>Produk tidak ditemukan</p>
+          <div className="text-center py-16 border border-dashed border-zinc-800 bg-zinc-900/30">
+            <TerminalSquare size={40} className="mx-auto mb-3 text-zinc-600" />
+            <p className="text-zinc-500 font-mono text-sm uppercase tracking-widest">{'>>'} DATA_NOT_FOUND</p>
           </div>
         ) : (
-          <div className="space-y-7">
+          <div className="space-y-10">
             {Object.entries(grouped).map(([brandLabel, prods]) => (
               <div key={brandLabel}>
-                <div className="flex items-center gap-2 mb-3">
+                <div className="flex items-center gap-3 mb-4 border-b border-zinc-800/50 pb-2">
                   {prods[0].img_url && (
-                    <Image src={prods[0].img_url} alt={brandLabel} width={22} height={22} className="rounded object-contain" />
+                    <div className="bg-zinc-900 p-1 border border-zinc-800">
+                      <Image src={prods[0].img_url} alt={brandLabel} width={20} height={20} className="object-contain" />
+                    </div>
                   )}
-                  <h2 className="font-bold text-gray-800 text-sm">{brandLabel}</h2>
-                  <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">{prods.length} produk</span>
+                  <h2 className="font-bold font-mono text-white text-sm uppercase tracking-widest">{brandLabel}</h2>
+                  <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">[{prods.length} Nodes]</span>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {prods.map(p => (
                     <button key={p.code} onClick={() => { setSelected(p); setTarget(''); setTargetInfo(null); }}
-                      className="card text-left hover:border-purple-300 hover:shadow-md transition-all flex items-start gap-3 group">
-                      <div className="w-12 h-12 rounded-xl overflow-hidden bg-gray-50 flex items-center justify-center flex-shrink-0 border border-gray-100">
+                      className="card-product text-left flex items-start gap-4 group">
+                      <div className="w-12 h-12 bg-zinc-950 border border-zinc-800 flex items-center justify-center flex-shrink-0 group-hover:border-red-500/50 transition-colors relative overflow-hidden">
+                        <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0)_50%,rgba(0,0,0,0.2)_50%)] bg-[length:100%_4px] z-10 pointer-events-none opacity-50" />
                         {p.img_url
-                          ? <Image src={p.img_url} alt={p.name} width={48} height={48} className="object-contain" />
-                          : <Zap size={20} className="text-gray-300" />
+                          ? <Image src={p.img_url} alt={p.name} width={36} height={36} className="object-contain grayscale-[30%] group-hover:grayscale-0 transition-all relative z-0" />
+                          : <Zap size={20} className="text-zinc-600 group-hover:text-red-500 transition-colors" />
                         }
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-gray-900 text-sm leading-tight truncate">{p.name}</p>
-                        <p className="text-xs text-gray-500 mt-0.5 truncate">{p.note}</p>
-                        <div className="flex items-center gap-2 mt-2">
-                          <span className="font-bold text-purple-600 text-sm">{formatRupiah(p.price)}</span>
+                        <p className="font-bold font-mono text-white text-sm uppercase tracking-wide leading-tight truncate group-hover:text-red-400 transition-colors">{p.name}</p>
+                        <p className="text-[10px] font-mono text-zinc-500 mt-1 truncate uppercase tracking-widest">{p.note}</p>
+                        <div className="flex items-center gap-3 mt-3">
+                          <span className="font-black font-mono text-red-500 text-sm drop-shadow-[0_0_5px_rgba(220,38,38,0.5)]">{formatRupiah(p.price)}</span>
                           {p.price_info.price_discount_percent > 0 && (
-                            <span className="text-xs text-green-600 bg-green-50 px-1.5 py-0.5 rounded-full font-medium">
+                            <span className="text-[10px] font-mono text-emerald-500 bg-emerald-950/30 border border-emerald-900/50 px-1.5 py-0.5 uppercase tracking-widest">
                               -{p.price_info.price_discount_percent}%
                             </span>
                           )}
                         </div>
                       </div>
-                      <ChevronRight size={15} className="text-gray-300 group-hover:text-purple-400 mt-1 flex-shrink-0 transition-colors" />
+                      <ChevronRight size={16} className="text-zinc-700 group-hover:text-red-500 mt-1 flex-shrink-0 transition-colors" />
                     </button>
                   ))}
                 </div>
@@ -362,89 +377,100 @@ export default function PpobPage() {
         )}
       </main>
 
-      {/* Order Modal */}
+      {/* Order Modal (Mecha Terminal Style) */}
       {selected && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center p-4"
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
           onClick={() => setSelected(null)}>
-          <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl animate-slide-up"
+          <div className="bg-zinc-900 border border-red-500 shadow-[0_0_40px_rgba(220,38,38,0.2)] p-6 w-full max-w-md relative overflow-hidden animate-slide-up"
             onClick={e => e.stopPropagation()}>
-            {/* Product Info */}
-            <div className="flex items-center gap-3 mb-5 pb-4 border-b border-gray-100">
-              <div className="w-14 h-14 rounded-xl overflow-hidden bg-gray-50 border border-gray-100 flex items-center justify-center flex-shrink-0">
-                {selected.img_url
-                  ? <Image src={selected.img_url} alt={selected.name} width={56} height={56} className="object-contain" />
-                  : <Zap size={24} className="text-gray-300" />
-                }
+            
+            {/* Tech Corners */}
+            <div className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-red-500"></div>
+            <div className="absolute bottom-0 left-0 w-6 h-6 border-b-2 border-l-2 border-red-500"></div>
+            {/* Scanlines */}
+            <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0)_50%,rgba(0,0,0,0.1)_50%)] bg-[length:100%_4px] pointer-events-none opacity-30" />
+
+            <div className="relative z-10">
+              {/* Product Info */}
+              <div className="flex items-center gap-4 mb-6 pb-4 border-b border-red-900/50">
+                <div className="w-14 h-14 bg-zinc-950 border border-zinc-700 flex items-center justify-center flex-shrink-0 relative overflow-hidden">
+                  <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0)_50%,rgba(0,0,0,0.2)_50%)] bg-[length:100%_4px] z-10 pointer-events-none" />
+                  {selected.img_url
+                    ? <Image src={selected.img_url} alt={selected.name} width={40} height={40} className="object-contain relative z-0" />
+                    : <Zap size={24} className="text-zinc-500" />
+                  }
+                </div>
+                <div className="flex-1">
+                  <p className="font-black font-mono text-white text-sm uppercase tracking-wide leading-snug">{selected.note || selected.name}</p>
+                  <p className="text-[10px] font-mono text-zinc-500 mt-1 uppercase tracking-widest">{getBrandLabel(selected.brand)} // {selected.category}</p>
+                  <div className="flex items-center gap-3 mt-2">
+                    <span className="font-black font-mono text-red-500 text-base drop-shadow-[0_0_5px_rgba(220,38,38,0.5)]">{formatRupiah(selected.price)}</span>
+                    {selected.price_info.price_discount_percent > 0 && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-mono text-zinc-600 line-through">{formatRupiah(selected.price_info.price_original)}</span>
+                        <span className="text-[10px] font-mono text-emerald-500 uppercase tracking-widest border border-emerald-900/50 bg-emerald-950/20 px-1">-{selected.price_info.price_discount_percent}%</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <button onClick={() => setSelected(null)} className="text-zinc-500 hover:text-red-500 transition-colors flex-shrink-0">
+                  <X size={20} />
+                </button>
               </div>
-              <div className="flex-1">
-                <p className="font-bold text-gray-900">{selected.note || selected.name}</p>
-                <p className="text-xs text-gray-500">{getBrandLabel(selected.brand)} • {selected.category}</p>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="font-bold text-purple-600">{formatRupiah(selected.price)}</span>
-                  {selected.price_info.price_discount_percent > 0 && (
-                    <>
-                      <span className="text-xs text-gray-400 line-through">{formatRupiah(selected.price_info.price_original)}</span>
-                      <span className="text-xs text-green-600 font-medium">-{selected.price_info.price_discount_percent}%</span>
-                    </>
+
+              {/* Target Input */}
+              <div className="mb-6">
+                <label className="block text-[10px] font-mono text-zinc-400 uppercase tracking-widest mb-2">
+                  {'>>'} {isGame ? 'Target_Game_ID' : isEwallet ? 'Target_Wallet/Phone' : 'Target_Number'}
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    className="flex-1 bg-zinc-950 border border-zinc-800 focus:border-red-500 focus:shadow-[0_0_10px_rgba(220,38,38,0.2)] text-white font-mono text-sm px-4 py-3 outline-none transition-all placeholder-zinc-700"
+                    placeholder={isGame ? 'Enter Game ID' : 'Enter Number/ID'}
+                    value={target}
+                    onChange={e => { setTarget(e.target.value); setTargetInfo(null); }}
+                  />
+                  {needsCheck && (
+                    <button onClick={checkTarget} disabled={checking || !target.trim()}
+                      className="px-5 py-3 bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-700 hover:border-zinc-500 font-mono text-xs uppercase tracking-widest transition-all disabled:opacity-50 flex-shrink-0">
+                      {checking ? <span className="spinner border-white/30 border-t-white" /> : 'Verify'}
+                    </button>
                   )}
                 </div>
-              </div>
-              <button onClick={() => setSelected(null)} className="text-gray-400 hover:text-gray-600 flex-shrink-0">
-                <X size={18} />
-              </button>
-            </div>
 
-            {/* Target Input */}
-            <div className="mb-4">
-              <label className="label">
-                {isGame ? 'ID Akun Game' : isEwallet ? 'Nomor Rekening/HP' : 'Nomor Tujuan'}
-              </label>
-              <div className="flex gap-2">
-                <input
-                  className="input flex-1"
-                  placeholder={isGame ? 'Masukkan ID akun game' : 'Masukkan nomor HP/rekening'}
-                  value={target}
-                  onChange={e => { setTarget(e.target.value); setTargetInfo(null); }}
-                />
-                {needsCheck && (
-                  <button onClick={checkTarget} disabled={checking || !target.trim()}
-                    className="px-3.5 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-sm font-medium transition-all disabled:opacity-50 flex-shrink-0">
-                    {checking ? <span className="spinner spinner-brand" /> : 'Cek'}
-                  </button>
+                {/* Target validation result */}
+                {targetInfo && (
+                  <div className={`mt-3 flex items-center gap-2 px-3 py-2 border text-xs font-mono uppercase tracking-widest ${
+                    targetInfo.status === 'valid' ? 'bg-emerald-950/30 border-emerald-900/50 text-emerald-500' : 'bg-red-950/30 border-red-900/50 text-red-500'
+                  }`}>
+                    {targetInfo.status === 'valid'
+                      ? <><CheckCircle size={14} /><span className="font-bold truncate">{targetInfo.name}</span></>
+                      : <><XCircle size={14} /><span>Invalid_Target</span></>
+                    }
+                  </div>
+                )}
+
+                {/* Info if needsCheck but not checked yet */}
+                {needsCheck && !targetInfo && target && (
+                  <p className="text-[10px] font-mono text-amber-500 mt-2 flex items-center gap-1.5 uppercase tracking-widest">
+                    <AlertCircle size={12} className="animate-pulse" /> Verify target ID before execution.
+                  </p>
                 )}
               </div>
 
-              {/* Target validation result */}
-              {targetInfo && (
-                <div className={`mt-2 flex items-center gap-2 px-3 py-2 rounded-lg text-sm ${
-                  targetInfo.status === 'valid' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-600'
-                }`}>
-                  {targetInfo.status === 'valid'
-                    ? <><CheckCircle size={14} /><span className="font-medium">{targetInfo.name}</span></>
-                    : <><XCircle size={14} /><span>Nomor tidak valid</span></>
-                  }
-                </div>
-              )}
+              {/* Info saldo */}
+              <div className="bg-zinc-950 border border-zinc-800 p-3 mb-6 text-[10px] font-mono text-zinc-500 uppercase tracking-widest flex items-start gap-2">
+                <span className="text-red-500 mt-0.5">{'>>'}</span>
+                <p>This execution utilizes <strong className="text-white font-black">Nokos_Credits</strong>. Ensure sufficient balance prior to authorization.</p>
+              </div>
 
-              {/* Info if needsCheck but not checked yet */}
-              {needsCheck && !targetInfo && target && (
-                <p className="text-xs text-amber-600 mt-1.5 flex items-center gap-1">
-                  <AlertCircle size={11} /> Klik Cek untuk verifikasi {isGame ? 'ID game' : 'nomor rekening'}
-                </p>
-              )}
+              <button
+                onClick={handleOrder}
+                disabled={ordering || !target.trim() || (needsCheck && targetInfo?.status !== 'valid')}
+                className="w-full py-4 bg-red-600 hover:bg-red-500 text-white font-mono font-bold uppercase tracking-widest border border-red-500 shadow-[0_0_15px_rgba(220,38,38,0.3)] transition-all flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed">
+                {ordering ? <span className="spinner border-white/30 border-t-white" /> : `Execute // ${formatRupiah(selected.price)}`}
+              </button>
             </div>
-
-            {/* Info saldo */}
-            <div className="bg-purple-50 rounded-xl p-3 mb-4 text-xs text-purple-700">
-              💡 Transaksi ini menggunakan <strong>Saldo Nokos</strong>. Pastikan saldo mencukupi sebelum beli.
-            </div>
-
-            <button
-              onClick={handleOrder}
-              disabled={ordering || !target.trim() || (needsCheck && targetInfo?.status !== 'valid')}
-              className="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-xl transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
-              {ordering ? <span className="spinner" /> : `Beli ${formatRupiah(selected.price)}`}
-            </button>
           </div>
         </div>
       )}
