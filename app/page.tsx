@@ -71,7 +71,7 @@ export default function HomePage() {
           <div className="mb-10 border-b-2 border-zinc-800 pb-4 flex items-end justify-between">
             <div>
               <h2 className="text-3xl font-black text-white uppercase tracking-tight">Database Layanan</h2>
-              <p className="text-red-500 font-mono text-xs mt-1">>> Select your module_</p>
+              <p className="text-red-500 font-mono text-xs mt-1">{'>>'} Select your module_</p>
             </div>
             <Crosshair className="text-red-600/50 animate-[spin_4s_linear_infinite]" size={32} />
           </div>
