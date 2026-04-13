@@ -19,7 +19,7 @@ export async function GET() {
     imageBase64: p.imageBase64,
     price: p.price,
     category: p.category,
-    stock: p.accounts.filter(a => !a.sold).length,
+    stock: p.accounts.filter((a: any) => !a.sold).length,
     source: 'custom',
   }));
 
