@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Users, ShoppingBag, Phone, CreditCard, TrendingUp, AlertCircle } from 'lucide-react';
+import { Users, ShoppingBag, Phone, CreditCard, TrendingUp, AlertCircle, Crosshair, TerminalSquare, Zap } from 'lucide-react';
 import { formatRupiah } from '@/lib/utils';
 
 interface Stats {
@@ -20,71 +20,109 @@ export default function AdminDashboard() {
   }, []);
 
   const cards = stats ? [
-    { label: 'Total User', value: stats.totalUsers.toLocaleString(), icon: Users, color: 'from-blue-500 to-blue-600', href: '/admin/users' },
-    { label: 'Order Premku', value: stats.totalPremkuOrders.toLocaleString(), icon: ShoppingBag, color: 'from-brand to-brand-dark', href: '/admin/transactions' },
-    { label: 'Order Nokos', value: stats.totalNokosOrders.toLocaleString(), icon: Phone, color: 'from-purple-500 to-purple-600', href: '/admin/transactions' },
-    { label: 'Total Pemasukan', value: formatRupiah(stats.premkuRevenue + stats.nokosRevenue), icon: TrendingUp, color: 'from-green-500 to-green-600', href: '/admin/transactions' },
-    { label: 'Pemasukan Premku', value: formatRupiah(stats.premkuRevenue), icon: CreditCard, color: 'from-orange-400 to-orange-500', href: '/admin/transactions' },
-    { label: 'Pemasukan Nokos', value: formatRupiah(stats.nokosRevenue), icon: CreditCard, color: 'from-teal-500 to-teal-600', href: '/admin/transactions' },
+    { label: 'Total_User_Nodes', value: stats.totalUsers.toLocaleString(), icon: Users, color: 'text-blue-500', bg: 'bg-blue-950/20', border: 'border-blue-900/50', hover: 'hover:border-blue-500', shadow: 'hover:shadow-[0_0_15px_rgba(59,130,246,0.2)]', href: '/admin/users' },
+    { label: 'Premku_Orders', value: stats.totalPremkuOrders.toLocaleString(), icon: ShoppingBag, color: 'text-red-500', bg: 'bg-red-950/20', border: 'border-red-900/50', hover: 'hover:border-red-500', shadow: 'hover:shadow-[0_0_15px_rgba(220,38,38,0.2)]', href: '/admin/transactions' },
+    { label: 'Nokos_Orders', value: stats.totalNokosOrders.toLocaleString(), icon: Phone, color: 'text-purple-500', bg: 'bg-purple-950/20', border: 'border-purple-900/50', hover: 'hover:border-purple-500', shadow: 'hover:shadow-[0_0_15px_rgba(168,85,247,0.2)]', href: '/admin/transactions' },
+    { label: 'Total_Revenue', value: formatRupiah(stats.premkuRevenue + stats.nokosRevenue), icon: TrendingUp, color: 'text-emerald-500', bg: 'bg-emerald-950/20', border: 'border-emerald-900/50', hover: 'hover:border-emerald-500', shadow: 'hover:shadow-[0_0_15px_rgba(16,185,129,0.2)]', href: '/admin/transactions' },
+    { label: 'Premku_Revenue', value: formatRupiah(stats.premkuRevenue), icon: CreditCard, color: 'text-orange-500', bg: 'bg-orange-950/20', border: 'border-orange-900/50', hover: 'hover:border-orange-500', shadow: 'hover:shadow-[0_0_15px_rgba(249,115,22,0.2)]', href: '/admin/transactions' },
+    { label: 'Nokos_Revenue', value: formatRupiah(stats.nokosRevenue), icon: CreditCard, color: 'text-teal-500', bg: 'bg-teal-950/20', border: 'border-teal-900/50', hover: 'hover:border-teal-500', shadow: 'hover:shadow-[0_0_15px_rgba(20,184,166,0.2)]', href: '/admin/transactions' },
   ] : [];
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-xl font-bold text-gray-900">Dashboard Admin</h1>
-        <p className="text-sm text-gray-500 mt-0.5">Selamat datang di panel admin Kirei Chisa</p>
+    <div className="space-y-8">
+      {/* Header */}
+      <div className="border-b border-zinc-800 pb-4">
+        <div className="flex items-center gap-3 mb-1">
+          <TerminalSquare className="text-red-500" size={28} />
+          <h1 className="text-2xl font-black text-white uppercase tracking-widest" style={{ textShadow: '2px 2px 0px #dc2626' }}>
+            Sys_Overview
+          </h1>
+        </div>
+        <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest pl-10">
+          {'>>'} Kirei_Chisa Command Center Telemetry
+        </p>
       </div>
 
+      {/* Warning Alert */}
       {stats?.pendingDeposits && stats.pendingDeposits > 0 ? (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 flex items-center gap-3">
-          <AlertCircle size={18} className="text-yellow-600 flex-shrink-0" />
-          <div className="flex-1">
-            <p className="text-sm font-semibold text-yellow-800">Ada {stats.pendingDeposits} deposit pending</p>
-            <p className="text-xs text-yellow-600">Beberapa deposit mungkin delay dan perlu konfirmasi manual.</p>
+        <div className="bg-amber-950/20 border border-amber-500/50 p-4 flex items-start sm:items-center gap-4 relative overflow-hidden shadow-[0_0_20px_rgba(245,158,11,0.1)]">
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0)_50%,rgba(0,0,0,0.1)_50%)] bg-[length:100%_4px] pointer-events-none opacity-50" />
+          <AlertCircle size={24} className="text-amber-500 flex-shrink-0 animate-pulse relative z-10" />
+          <div className="flex-1 relative z-10">
+            <p className="text-xs font-black font-mono uppercase tracking-widest text-amber-500 mb-1">
+              [SYSTEM_WARNING] {stats.pendingDeposits} Pending Injections Detected
+            </p>
+            <p className="text-[10px] font-mono text-amber-600/80 uppercase tracking-widest">
+              Manual verification required for delayed deposit nodes.
+            </p>
           </div>
-          <Link href="/admin/transactions" className="text-xs bg-yellow-100 hover:bg-yellow-200 text-yellow-700 px-3 py-1.5 rounded-lg transition-colors font-medium flex-shrink-0">
-            Lihat →
+          <Link href="/admin/transactions" className="text-[10px] font-mono font-bold uppercase tracking-widest bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/50 text-amber-400 px-4 py-2 transition-colors flex-shrink-0 relative z-10">
+            Resolve_Now {'>>'}
           </Link>
         </div>
       ) : null}
 
+      {/* Stats Grid */}
       {loading ? (
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-          {[...Array(6)].map((_, i) => <div key={i} className="h-28 rounded-2xl bg-gray-200 animate-pulse" />)}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="h-32 bg-zinc-900/50 border border-zinc-800 animate-pulse relative">
+              <div className="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-zinc-700"></div>
+              <div className="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-zinc-700"></div>
+            </div>
+          ))}
         </div>
       ) : (
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-          {cards.map(({ label, value, icon: Icon, color, href }) => (
-            <Link key={label} href={href} className="group bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-all">
-              <div className="flex items-start justify-between mb-3">
-                <div className={`w-11 h-11 bg-gradient-to-br ${color} rounded-xl flex items-center justify-center`}>
-                  <Icon size={20} className="text-white" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {cards.map(({ label, value, icon: Icon, color, bg, border, hover, shadow, href }) => (
+            <Link key={label} href={href} className={`group ${bg} border ${border} ${hover} ${shadow} p-5 relative overflow-hidden transition-all duration-300`}>
+              {/* Tech Corners */}
+              <div className={`absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 ${color.replace('text-', 'border-')} opacity-50 group-hover:opacity-100 transition-opacity`}></div>
+              <div className={`absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 ${color.replace('text-', 'border-')} opacity-50 group-hover:opacity-100 transition-opacity`}></div>
+              
+              <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0)_50%,rgba(0,0,0,0.1)_50%)] bg-[length:100%_4px] pointer-events-none opacity-30" />
+              
+              <div className="relative z-10 flex flex-col h-full">
+                <div className="flex items-start justify-between mb-4">
+                  <div className={`w-10 h-10 bg-zinc-950 border ${border} flex items-center justify-center`}>
+                    <Icon size={18} className={`${color}`} />
+                  </div>
+                  <Crosshair size={14} className="text-zinc-600 group-hover:animate-[spin_4s_linear_infinite]" />
+                </div>
+                <div className="mt-auto">
+                  <p className={`text-2xl sm:text-3xl font-black font-mono ${color} tracking-tight mb-1 drop-shadow-[0_0_5px_currentColor]`}>{value}</p>
+                  <p className="text-[10px] font-mono text-zinc-400 uppercase tracking-widest">{label}</p>
                 </div>
               </div>
-              <p className="text-2xl font-bold text-gray-900 mb-1">{value}</p>
-              <p className="text-sm text-gray-500">{label}</p>
             </Link>
           ))}
         </div>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {[
-          { href: '/admin/users', label: 'Kelola User', desc: 'Lihat dan atur saldo user', icon: Users, color: 'text-blue-600 bg-blue-50' },
-          { href: '/admin/transactions', label: 'Transaksi', desc: 'Konfirmasi deposit & monitor order', icon: ShoppingBag, color: 'text-brand bg-brand/10' },
-          { href: '/admin/banners', label: 'Banner Promosi', desc: 'Atur banner di halaman utama', icon: CreditCard, color: 'text-purple-600 bg-purple-50' },
-          { href: '/admin/settings', label: 'Pengaturan', desc: 'Sosmed, FAQ, harga deposit', icon: TrendingUp, color: 'text-green-600 bg-green-50' },
-        ].map(({ href, label, desc, icon: Icon, color }) => (
-          <Link key={href} href={href} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex items-center gap-3 hover:shadow-md transition-all">
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${color}`}>
-              <Icon size={18} />
-            </div>
-            <div>
-              <p className="font-semibold text-gray-900 text-sm">{label}</p>
-              <p className="text-xs text-gray-500">{desc}</p>
-            </div>
-          </Link>
-        ))}
+      {/* Quick Access Links */}
+      <div className="mt-8">
+        <h2 className="text-sm font-black text-white uppercase tracking-widest mb-4 flex items-center gap-2 border-b border-zinc-800 pb-2">
+          <Zap size={16} className="text-red-500" /> Quick_Directives
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {[
+            { href: '/admin/users', label: 'Manage_User_Nodes', desc: 'Monitor and adjust user balances', icon: Users, color: 'text-blue-500', border: 'group-hover:border-blue-500' },
+            { href: '/admin/transactions', label: 'Verify_Transactions', desc: 'Confirm deposits & track orders', icon: ShoppingBag, color: 'text-red-500', border: 'group-hover:border-red-500' },
+            { href: '/admin/banners', label: 'Promo_Banners_Cfg', labelClass: 'truncate', desc: 'Modify front-end visual displays', icon: CreditCard, color: 'text-purple-500', border: 'group-hover:border-purple-500' },
+            { href: '/admin/settings', label: 'Core_Settings', desc: 'Configure social links, FAQs & rates', icon: TrendingUp, color: 'text-emerald-500', border: 'group-hover:border-emerald-500' },
+          ].map(({ href, label, desc, icon: Icon, color, border }) => (
+            <Link key={href} href={href} className={`bg-zinc-900 border border-zinc-800 ${border} p-4 flex items-center gap-4 transition-all duration-300 group relative overflow-hidden`}>
+              <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0)_50%,rgba(0,0,0,0.1)_50%)] bg-[length:100%_4px] pointer-events-none opacity-0 group-hover:opacity-30 transition-opacity" />
+              <div className={`w-12 h-12 bg-zinc-950 border border-zinc-800 flex items-center justify-center flex-shrink-0 relative z-10 transition-colors ${border}`}>
+                <Icon size={20} className={`${color}`} />
+              </div>
+              <div className="relative z-10 min-w-0 flex-1">
+                <p className="font-bold font-mono text-white text-xs sm:text-sm uppercase tracking-widest mb-1 truncate">{label}</p>
+                <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest truncate">{desc}</p>
+              </div>
+            </Link>
+          ))}
+        </div>
       </div>
     </div>
   );
