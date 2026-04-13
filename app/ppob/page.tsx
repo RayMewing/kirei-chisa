@@ -80,9 +80,18 @@ export default function PpobPage() {
     try {
       const res = await fetch('/api/ppob/products');
       const data = await res.json();
-      if (data.success) setProducts(data.products);
-      else toast.error('Gagal memuat produk PPOB');
-    } finally { setLoading(false); }
+      if (data.success) {
+        setProducts(data.products);
+      } else {
+        toast.error(data.message || 'Gagal memuat produk PPOB');
+        console.error('PPOB page error:', data.message);
+      }
+    } catch (err) {
+      console.error('PPOB fetch error:', err);
+      toast.error('Gagal terhubung ke server.');
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => { fetchProducts(); }, [fetchProducts]);
