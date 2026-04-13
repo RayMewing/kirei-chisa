@@ -2,13 +2,14 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutDashboard, Users, Receipt, Image, Settings, LogOut, Menu, X, Shield, User } from 'lucide-react';
+import { LayoutDashboard, Users, Receipt, Image, Settings, LogOut, Menu, X, Shield, User, Package } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const adminNav = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/admin/users', label: 'Users', icon: Users },
   { href: '/admin/transactions', label: 'Transaksi', icon: Receipt },
+  { href: '/admin/products', label: 'Produk', icon: Package },
   { href: '/admin/banners', label: 'Banner', icon: Image },
   { href: '/admin/settings', label: 'Pengaturan', icon: Settings },
   { href: '/admin/profile', label: 'Profil Admin', icon: User },
