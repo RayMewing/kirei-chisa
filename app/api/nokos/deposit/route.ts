@@ -21,8 +21,9 @@ export async function POST(req: NextRequest) {
     if (!user) return NextResponse.json({ success: false, message: 'User tidak ditemukan.' }, { status: 404 });
 
     // 1. Ambil data Fee QRIS dari Database Settings
-    const feeSetting = await Settings.findOne({ key: 'qris_fee_percent' }).lean();
-    const qrisFeePercent = feeSetting ? parseFloat(feeSetting.value as string) || 0 : 0;
+        // 1. Ambil data Fee QRIS dari Database Settings
+    const feeSetting = await Settings.findOne({ key: 'qris_fee_percent' }).lean() as any;
+    const qrisFeePercent = feeSetting?.value ? parseFloat(feeSetting.value) || 0 : 0;
 
     // 2. Hitung Fee dan Total Permintaan
     // Contoh: 10000 * (2 / 100) = 200
