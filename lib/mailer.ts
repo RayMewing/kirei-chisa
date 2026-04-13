@@ -10,6 +10,15 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+// Pengecekan koneksi SMTP (akan muncul di log terminal/Vercel)
+transporter.verify(function (error, success) {
+  if (error) {
+    console.error("❌ Error Koneksi SMTP:", error);
+  } else {
+    console.log("✅ Server SMTP siap mengirim email!");
+  }
+});
+
 export async function sendOTPEmail(to: string, otp: string, type: 'register' | 'admin' = 'register') {
   const subject = type === 'admin'
     ? '🔐 Kirei Chisa - Kode OTP Admin Login'
