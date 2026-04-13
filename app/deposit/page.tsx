@@ -5,7 +5,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import toast from 'react-hot-toast';
 import Image from 'next/image';
-import { CreditCard, ShoppingBag, Phone, RefreshCw, X, Copy } from 'lucide-react';
+import { CreditCard, ShoppingBag, Phone, RefreshCw, X, Copy, Zap, TerminalSquare } from 'lucide-react';
 import { formatRupiah } from '@/lib/utils';
 
 type DepType = 'premku' | 'nokos';
@@ -31,7 +31,7 @@ function DepositContent() {
 
   const handleDeposit = async () => {
     const num = parseInt(amount);
-    if (!num || num < 10000) { toast.error('Minimum deposit Rp10.000'); return; }
+    if (!num || num < 10000) { toast.error('Minimum inject Rp10.000'); return; }
     setLoading(true);
     try {
       const endpoint = depType === 'premku' ? '/api/premku/deposit' : '/api/nokos/deposit';
@@ -59,7 +59,7 @@ function DepositContent() {
         expiredIn: dep.expiredIn,
         expiredAt: dep.expiredAt,
       });
-      toast.success('Deposit dibuat! Scan QR untuk membayar.');
+      toast.success('Sequence initialized. Scan QR to transmit funds.');
     } finally { setLoading(false); }
   };
 
@@ -83,15 +83,15 @@ function DepositContent() {
       if (data.success) {
         const dep = data.deposit;
         setResult(prev => prev ? { ...prev, status: dep.status, qrImage: dep.qrImage || prev.qrImage } : prev);
-        if (dep.status === 'success') toast.success('Pembayaran berhasil! Saldo sudah ditambahkan.');
-        else if (dep.status === 'canceled' || dep.status === 'cancel') toast('Deposit dibatalkan.');
-        else toast('Pembayaran belum terdeteksi. Coba lagi.');
+        if (dep.status === 'success') toast.success('Transmission complete! Funds added.');
+        else if (dep.status === 'canceled' || dep.status === 'cancel') toast('Sequence aborted.');
+        else toast('Awaiting transmission. Please retry.');
       }
     } finally { setCheckLoading(false); }
   };
 
   const handleCancel = async () => {
-    if (!result || !confirm('Batalkan deposit ini?')) return;
+    if (!result || !confirm('Abort this sequence?')) return;
     try {
       let res;
       if (result.type === 'premku') {
@@ -106,118 +106,164 @@ function DepositContent() {
         });
       }
       const data = await res.json();
-      if (data.success) { toast.success('Deposit dibatalkan.'); setResult(null); setAmount(''); }
+      if (data.success) { toast.success('Sequence aborted.'); setResult(null); setAmount(''); }
       else toast.error(data.message);
-    } catch { toast.error('Gagal membatalkan.'); }
+    } catch { toast.error('Failed to abort sequence.'); }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-zinc-950 text-zinc-100 relative overflow-hidden font-sans selection:bg-red-600 selection:text-white">
+      {/* Cyber Background Glow */}
+      <div className="absolute top-0 right-1/4 w-96 h-96 bg-red-600/5 blur-[150px] pointer-events-none -z-10" />
+
       <Navbar />
-      <main className="pt-16 max-w-xl mx-auto px-4 sm:px-6 py-8">
-        <div className="mb-6 flex items-center gap-2">
-          <CreditCard size={22} className="text-brand" />
-          <h1 className="section-title">Deposit Saldo</h1>
+      <main className="pt-24 max-w-xl mx-auto px-4 sm:px-6 py-8 relative z-10">
+        
+        {/* Header Title */}
+        <div className="mb-8 border-b border-zinc-800 pb-4">
+          <div className="flex items-center gap-3 mb-1">
+            <Zap className="text-red-500" size={28} />
+            <h1 className="text-3xl font-black text-white uppercase tracking-tight" style={{ textShadow: '2px 2px 0px #dc2626' }}>
+              Funds_Inject
+            </h1>
+          </div>
+          <p className="text-zinc-500 font-mono text-xs pl-10">{'>>'} Initialize balance top-up sequence_</p>
         </div>
 
         {/* Type Selector */}
-        <div className="grid grid-cols-2 gap-3 mb-6">
+        <div className="grid grid-cols-2 gap-3 mb-8">
           {(['premku', 'nokos'] as DepType[]).map(t => (
             <button key={t} onClick={() => { setDepType(t); setResult(null); setAmount(''); }}
-              className={`p-4 rounded-2xl border-2 flex items-center gap-3 transition-all ${
-                depType === t ? t === 'premku' ? 'border-brand bg-brand/5' : 'border-blue-500 bg-blue-50' : 'border-gray-200 bg-white hover:border-gray-300'
+              className={`p-4 border-2 relative overflow-hidden flex items-center justify-center sm:justify-start gap-3 transition-all group ${
+                depType === t 
+                  ? t === 'premku' ? 'border-red-500 bg-red-950/30 shadow-[0_0_15px_rgba(220,38,38,0.2)]' : 'border-white bg-white/5 shadow-[0_0_15px_rgba(255,255,255,0.1)]' 
+                  : 'border-zinc-800 bg-zinc-900 hover:border-zinc-600'
               }`}>
-              {t === 'premku' ? <ShoppingBag size={22} className={depType === t ? 'text-brand' : 'text-gray-400'} />
-                : <Phone size={22} className={depType === t ? 'text-blue-600' : 'text-gray-400'} />}
-              <div className="text-left">
-                <p className={`font-bold text-sm ${depType === t ? t === 'premku' ? 'text-brand' : 'text-blue-700' : 'text-gray-600'}`}>
-                  {t === 'premku' ? 'Premku' : 'Nokos'}
+              {/* Scanlines on active */}
+              {depType === t && <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0)_50%,rgba(0,0,0,0.1)_50%)] bg-[length:100%_4px] pointer-events-none opacity-50" />}
+              
+              {t === 'premku' ? (
+                <ShoppingBag size={22} className={`relative z-10 ${depType === t ? 'text-red-500' : 'text-zinc-600'}`} />
+              ) : (
+                <Phone size={22} className={`relative z-10 ${depType === t ? 'text-white' : 'text-zinc-600'}`} />
+              )}
+              <div className="text-left relative z-10 hidden sm:block">
+                <p className={`font-mono font-bold text-sm uppercase tracking-wider ${depType === t ? t === 'premku' ? 'text-red-500' : 'text-white' : 'text-zinc-500'}`}>
+                  {t === 'premku' ? 'Premku_DB' : 'Nokos_OTP'}
                 </p>
-                <p className="text-xs text-gray-500">{t === 'premku' ? 'Akun Premium' : 'OTP Virtual'}</p>
+                <p className="text-[10px] font-mono text-zinc-500 tracking-widest">{t === 'premku' ? 'Premium Node' : 'Virtual Node'}</p>
               </div>
             </button>
           ))}
         </div>
 
         {!result ? (
-          <div className="card shadow-sm">
-            <h2 className="font-bold text-gray-900 mb-4">Jumlah Deposit</h2>
+          <div className="bg-zinc-900/80 border border-zinc-800 p-6 relative">
+            <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-zinc-600"></div>
+            <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-zinc-600"></div>
+
+            <h2 className="font-bold font-mono text-white mb-4 uppercase tracking-widest flex items-center gap-2 border-b border-zinc-800 pb-2">
+              <TerminalSquare size={16} className="text-zinc-500" />
+              Specify_Amount
+            </h2>
+            
             {/* Presets */}
-            <div className="grid grid-cols-3 gap-2 mb-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
               {presets.map(p => (
                 <button key={p} onClick={() => setAmount(String(p))}
-                  className={`py-2 text-sm font-medium rounded-xl border transition-all ${
-                    amount === String(p) ? 'bg-brand text-white border-brand' : 'bg-gray-50 text-gray-700 border-gray-200 hover:border-brand/40'
+                  className={`py-3 text-xs font-mono font-bold uppercase tracking-widest border transition-all ${
+                    amount === String(p) 
+                      ? 'bg-red-600 text-white border-red-500 shadow-[0_0_10px_rgba(220,38,38,0.5)]' 
+                      : 'bg-zinc-950 text-zinc-400 border-zinc-800 hover:border-red-500/50 hover:text-red-400'
                   }`}>
                   {formatRupiah(p)}
                 </button>
               ))}
             </div>
 
-            <div className="mb-5">
-              <label className="label">Atau masukkan nominal</label>
+            <div className="mb-8">
+              <label className="block text-xs font-mono text-zinc-500 mb-2 uppercase tracking-widest">{'>>'} Custom_Input</label>
               <div className="relative">
-                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 text-sm font-medium">Rp</span>
-                <input type="number" className="input pl-10" placeholder="10000" min={10000} max={5000000}
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 font-mono text-sm font-bold">Rp</span>
+                <input type="number" className="input pl-11 bg-zinc-950 text-white font-mono text-lg font-bold border-zinc-800 focus:border-red-500 focus:shadow-[0_0_10px_rgba(220,38,38,0.2)]" 
+                  placeholder="10000" min={10000} max={5000000}
                   value={amount} onChange={e => setAmount(e.target.value)} />
               </div>
-              <p className="text-xs text-gray-400 mt-1.5">Min. Rp10.000 • Max. Rp5.000.000</p>
+              <p className="text-[10px] font-mono text-zinc-500 mt-2">SYS.LIMIT: Min. Rp10.000 // Max. Rp5.000.000</p>
             </div>
 
             <button onClick={handleDeposit} disabled={loading || !amount}
-              className={`btn-primary w-full py-3 ${depType === 'nokos' ? 'bg-blue-600 hover:bg-blue-700' : ''}`}>
-              {loading ? <span className="spinner" /> : `Buat Deposit ${depType === 'premku' ? 'Premku' : 'Nokos'}`}
+              className={`w-full py-4 text-xs font-mono font-bold uppercase tracking-widest flex items-center justify-center gap-2 transition-all ${
+                loading || !amount 
+                  ? 'bg-zinc-950 border border-zinc-800 text-zinc-600 cursor-not-allowed' 
+                  : depType === 'nokos' 
+                    ? 'bg-white border border-white text-zinc-950 hover:bg-zinc-200 shadow-[0_0_15px_rgba(255,255,255,0.2)]'
+                    : 'bg-red-600 border border-red-500 text-white hover:bg-red-500 shadow-[0_0_15px_rgba(220,38,38,0.4)]'
+              }`}>
+              {loading ? <span className={`spinner ${depType === 'nokos' ? 'border-zinc-900/30 border-t-zinc-900' : 'border-white/30 border-t-white'}`} /> : `Execute_Inject // ${depType.toUpperCase()}`}
             </button>
           </div>
         ) : (
-          <div className="card shadow-sm">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="font-bold text-gray-900">Detail Deposit</h2>
-              {result.status === 'success' && <span className="badge-success">Sukses ✓</span>}
-              {result.status === 'pending' && <span className="badge-pending">Menunggu</span>}
-              {(result.status === 'canceled' || result.status === 'cancel') && <span className="badge-failed">Dibatalkan</span>}
+          <div className={`bg-zinc-900 border p-6 relative ${result.type === 'premku' ? 'border-red-900/50 shadow-[0_0_30px_rgba(220,38,38,0.1)]' : 'border-zinc-700 shadow-[0_0_30px_rgba(255,255,255,0.05)]'}`}>
+            {/* Tech Corners */}
+            <div className={`absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 ${result.type === 'premku' ? 'border-red-500' : 'border-white'}`}></div>
+            <div className={`absolute bottom-0 left-0 w-6 h-6 border-b-2 border-l-2 ${result.type === 'premku' ? 'border-red-500' : 'border-white'}`}></div>
+            
+            <div className="flex items-center justify-between mb-6 border-b border-zinc-800 pb-3">
+              <h2 className="font-black font-mono text-white uppercase tracking-widest">Inject_Details</h2>
+              {result.status === 'success' && <span className="badge-success">Success</span>}
+              {result.status === 'pending' && <span className="badge-pending animate-pulse">Awaiting</span>}
+              {(result.status === 'canceled' || result.status === 'cancel') && <span className="badge-failed">Aborted</span>}
             </div>
 
             {/* QR Code */}
             {result.qrImage && result.status === 'pending' && (
-              <div className="text-center mb-4">
-                <Image src={result.qrImage} alt="QR Code" width={220} height={220} className="mx-auto rounded-xl border" />
+              <div className="text-center mb-6 relative w-fit mx-auto group">
+                <div className="absolute -inset-2 bg-gradient-to-r from-red-500 to-blue-500 opacity-20 blur-xl group-hover:opacity-40 transition-opacity" />
+                <div className="relative bg-white p-2 border-4 border-zinc-800 group-hover:border-red-500 transition-colors">
+                  <Image src={result.qrImage} alt="QR Code" width={220} height={220} className="mx-auto" />
+                  {/* Scanline overlay over QR */}
+                  <div className="absolute inset-0 bg-[linear-gradient(rgba(0,255,0,0)_50%,rgba(0,255,0,0.1)_50%)] bg-[length:100%_4px] pointer-events-none opacity-50" />
+                </div>
                 {result.qrRaw && (
-                  <button onClick={() => { navigator.clipboard.writeText(result.qrRaw!); toast.success('QR string disalin!'); }}
-                    className="text-xs text-gray-500 mt-2 hover:text-brand flex items-center gap-1 mx-auto">
-                    <Copy size={11} /> Salin kode QR
+                  <button onClick={() => { navigator.clipboard.writeText(result.qrRaw!); toast.success('QR String Copied!'); }}
+                    className="text-xs font-mono text-zinc-400 mt-4 hover:text-white flex items-center justify-center gap-2 mx-auto uppercase bg-zinc-950 px-3 py-1.5 border border-zinc-800 hover:border-zinc-600 transition-all">
+                    <Copy size={12} /> Copy_QR_String
                   </button>
                 )}
               </div>
             )}
 
-            {/* Details */}
-            <div className="bg-gray-50 rounded-xl p-4 mb-4 space-y-2 text-sm">
-              <div className="flex justify-between"><span className="text-gray-500">Tipe</span><span className="font-medium capitalize">{result.type}</span></div>
-              <div className="flex justify-between"><span className="text-gray-500">Nominal</span><span className="font-medium">{formatRupiah(result.amount)}</span></div>
-              {result.kodeUnik && <div className="flex justify-between"><span className="text-gray-500">Kode Unik</span><span className="font-medium text-brand">+{result.kodeUnik}</span></div>}
-              {result.totalBayar && <div className="flex justify-between border-t pt-2"><span className="text-gray-700 font-semibold">Total Bayar</span><span className="font-bold text-brand">{formatRupiah(result.totalBayar)}</span></div>}
-              {result.fee && <div className="flex justify-between"><span className="text-gray-500">Fee</span><span className="font-medium">{formatRupiah(result.fee)}</span></div>}
-              {result.diterima && <div className="flex justify-between"><span className="text-gray-500">Diterima</span><span className="font-medium text-green-600">{formatRupiah(result.diterima)}</span></div>}
+            {/* Details Table */}
+            <div className="bg-zinc-950 border border-zinc-800 p-4 mb-6 space-y-3 font-mono text-xs">
+              <div className="flex justify-between items-center border-b border-zinc-800/50 pb-2"><span className="text-zinc-500 uppercase">Target_Node</span><span className="font-bold text-white uppercase">{result.type}</span></div>
+              <div className="flex justify-between items-center border-b border-zinc-800/50 pb-2"><span className="text-zinc-500 uppercase">Base_Amount</span><span className="font-bold text-zinc-300">{formatRupiah(result.amount)}</span></div>
+              {result.kodeUnik && <div className="flex justify-between items-center border-b border-zinc-800/50 pb-2"><span className="text-zinc-500 uppercase">Sys_Code</span><span className="font-bold text-red-500">+{result.kodeUnik}</span></div>}
+              {result.fee && <div className="flex justify-between items-center border-b border-zinc-800/50 pb-2"><span className="text-zinc-500 uppercase">Network_Fee</span><span className="font-medium text-zinc-400">{formatRupiah(result.fee)}</span></div>}
+              
+              {result.totalBayar && <div className="flex justify-between items-center pt-2"><span className="text-zinc-300 font-black uppercase">Total_Required</span><span className="font-black text-red-500 text-sm drop-shadow-[0_0_5px_rgba(220,38,38,0.5)]">{formatRupiah(result.totalBayar)}</span></div>}
+              {result.diterima && <div className="flex justify-between items-center mt-2 bg-emerald-950/20 border border-emerald-900/50 p-2"><span className="text-emerald-600/70 uppercase font-bold">Funds_Received</span><span className="font-black text-emerald-400 text-sm drop-shadow-[0_0_5px_rgba(16,185,129,0.3)]">{formatRupiah(result.diterima)}</span></div>}
             </div>
 
             {result.status === 'pending' && (
               <>
-                <p className="text-xs text-center text-gray-400 mb-3">Bayar via QRIS sebelum waktu habis</p>
-                <div className="flex gap-2">
-                  <button onClick={handleCheckStatus} disabled={checkLoading} className="btn-primary flex-1 py-2.5 text-sm">
-                    {checkLoading ? <span className="spinner" /> : <><RefreshCw size={14} />Cek Status</>}
+                <p className="text-[10px] font-mono text-center text-amber-500/80 mb-4 uppercase tracking-widest border border-amber-900/30 bg-amber-950/20 py-2">
+                  <span className="animate-pulse mr-2">⚠️</span> Transmit via QRIS before timeout
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <button onClick={handleCheckStatus} disabled={checkLoading} className="btn-secondary flex-1 py-3 text-xs">
+                    {checkLoading ? <span className="spinner border-red-500/30 border-t-red-500" /> : <><RefreshCw size={14} /> Ping_Status</>}
                   </button>
-                  <button onClick={handleCancel} className="btn-danger px-4 py-2.5">
-                    <X size={14} />Cancel
+                  <button onClick={handleCancel} className="btn-danger sm:px-6 py-3 text-xs">
+                    <X size={14} /> Abort
                   </button>
                 </div>
               </>
             )}
 
             {(result.status === 'success' || result.status === 'canceled' || result.status === 'cancel') && (
-              <button onClick={() => { setResult(null); setAmount(''); }} className="btn-secondary w-full py-2.5 text-sm">
-                Buat Deposit Baru
+              <button onClick={() => { setResult(null); setAmount(''); }} className="w-full py-3 bg-zinc-950 border border-zinc-700 hover:border-white text-zinc-300 hover:text-white transition-all font-mono text-xs uppercase tracking-widest font-bold">
+                Initialize_New_Inject
               </button>
             )}
           </div>
@@ -230,7 +276,15 @@ function DepositContent() {
 
 export default function DepositPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="spinner spinner-brand scale-150" /></div>}>
+    <Suspense fallback={
+      <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center">
+        <div className="relative">
+          <div className="absolute inset-0 bg-red-600 blur-xl opacity-20 animate-pulse rounded-full" />
+          <div className="spinner border-[3px] border-zinc-800 border-t-red-600 w-12 h-12 relative z-10" />
+        </div>
+        <p className="font-mono text-red-500 text-xs mt-4 uppercase tracking-widest animate-pulse">Initializing_Module...</p>
+      </div>
+    }>
       <DepositContent />
     </Suspense>
   );
