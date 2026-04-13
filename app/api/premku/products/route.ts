@@ -1,12 +1,16 @@
 import { NextResponse } from 'next/server';
 
+// 🔥 INI KUNCINYA: Paksa Next.js buat matiin cache 100%
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     const res = await fetch('https://premku.com/api/products', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ api_key: process.env.PREMKU_API_KEY }),
-      next: { revalidate: 60 },
+      // Ubah jadi 0 biar cache-nya bener-bener mati dan datanya real-time
+      next: { revalidate: 0 },
     });
     const data = await res.json();
     if (!data.success) throw new Error('Failed to fetch products');
