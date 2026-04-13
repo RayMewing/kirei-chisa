@@ -9,11 +9,16 @@ export async function GET() {
         'x-apikey': process.env.RUMAHOTP_API_KEY || '',
         'Accept': 'application/json',
       },
-      cache: 'no-store', // <-- KUNCI PERBAIKANNYA DI SINI
+      cache: 'no-store',
     });
     
     const data = await res.json();
-    if (!data.success) throw new Error('Failed to fetch PPOB products');
+    
+    // 👇 BAGIAN INI YANG KITA UBAH BUAT CEK ALASAN PENOLAKAN
+    if (!data.success) {
+      console.error('🚨 ALASAN DITOLAK RUMAHOTP:', data); 
+      throw new Error('Failed to fetch PPOB products');
+    }
     
     return NextResponse.json({ success: true, products: data.data });
   } catch (err) {
