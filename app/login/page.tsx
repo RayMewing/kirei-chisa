@@ -29,9 +29,9 @@ export default function LoginPage() {
         toast.error(data.message);
         return;
       }
-      toast.success('Login berhasil!');
-      router.push('/dashboard');
-      router.refresh();
+              toast.success('Login berhasil!');
+        window.location.href = '/dashboard'; 
+
     } finally { setLoading(false); }
   };
 
