@@ -3,55 +3,62 @@ import Footer from '@/components/Footer';
 import BannerSlider from '@/components/BannerSlider';
 import ServerStatus from '@/components/ServerStatus';
 import Link from 'next/link';
-import { ShoppingBag, Phone, Zap, Shield, Clock, Star, ArrowRight } from 'lucide-react';
+import { ShoppingBag, Phone, Zap, Shield, Clock, Star, ArrowRight, Crosshair } from 'lucide-react';
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-stone-50 relative overflow-hidden">
-      {/* Background Ornaments / Glow Effects - Soft Red & White */}
-      <div className="absolute top-0 left-0 w-full h-[500px] bg-gradient-to-b from-rose-100/60 to-transparent -z-10" />
-      <div className="absolute -top-32 -right-32 w-96 h-96 bg-red-300/10 rounded-full blur-[100px] -z-10" />
-      <div className="absolute top-64 -left-32 w-80 h-80 bg-rose-300/10 rounded-full blur-[100px] -z-10" />
+    <div className="min-h-screen bg-zinc-950 text-zinc-100 relative overflow-hidden selection:bg-red-600 selection:text-white font-sans">
+      {/* Cyberpunk Grid Background */}
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(220,38,38,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(220,38,38,0.05)_1px,transparent_1px)] bg-[size:30px_30px] opacity-80 pointer-events-none -z-10" />
+
+      {/* Glowing Neon Accents */}
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-red-600/10 rounded-full blur-[120px] pointer-events-none -z-10" />
+      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-red-600/10 rounded-full blur-[120px] pointer-events-none -z-10" />
 
       <Navbar />
-      <main className="pt-20 pb-16">
+      <main className="pt-24 pb-16">
         {/* Hero Section */}
         <section className="max-w-5xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between mb-6 flex-wrap gap-4 relative z-10">
-            <div>
-              <h2 className="text-sm font-bold text-rose-600 tracking-widest uppercase mb-1 flex items-center gap-2">
-                <Zap size={16} className="text-rose-500" /> Platform Terpercaya
+            <div className="flex items-center gap-3">
+              <span className="w-3 h-3 bg-red-500 animate-pulse shadow-[0_0_10px_rgba(239,68,68,0.8)]"></span>
+              <h2 className="text-xs font-mono font-bold text-red-500 tracking-[0.2em] uppercase">
+                Sys.Online // Kirei_Chisa
               </h2>
             </div>
             <ServerStatus />
           </div>
 
-          {/* Video Container 16:9 */}
-          <div className="relative w-full aspect-video rounded-[2rem] overflow-hidden shadow-2xl shadow-rose-900/10 mb-10 group border border-white/80">
+          {/* Video Container 16:9 - Mecha / Cyberpunk Style */}
+          <div className="relative w-full aspect-video overflow-hidden mb-10 group border-l-4 border-red-600 bg-zinc-900 shadow-[0_0_30px_rgba(220,38,38,0.15)]">
+            {/* Tech Corners */}
+            <div className="absolute top-0 right-0 w-10 h-10 border-t-2 border-r-2 border-white/50 z-20"></div>
+            <div className="absolute bottom-0 left-0 w-10 h-10 border-b-2 border-l-2 border-white/50 z-20"></div>
+
             <video
               autoPlay
               loop
               muted
               playsInline
-              className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-              src="https://litter.catbox.moe/2blbf01u1qz6k687.mp4" 
+              className="absolute inset-0 w-full h-full object-cover opacity-80 mix-blend-luminosity group-hover:mix-blend-normal transition-all duration-700"
+              src="/assets/kirei.mp4" 
             />
             
-            {/* Overlay Gradient & Teks - Soft dark rose overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-rose-950/80 via-rose-900/30 to-white/10 flex flex-col items-center justify-center text-center p-6 sm:p-10 backdrop-blur-[1px]">
-              <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-white mb-4 tracking-tight drop-shadow-lg">
+            {/* Overlay Scanlines & Tech Gradient */}
+            <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0)_50%,rgba(0,0,0,0.1)_50%)] bg-[length:100%_4px] z-10 pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-r from-zinc-950/95 via-zinc-900/70 to-transparent z-10 flex flex-col justify-center p-6 sm:p-12">
+              <h1 className="text-4xl sm:text-6xl md:text-7xl font-black text-white mb-2 uppercase tracking-tighter" style={{ textShadow: '3px 3px 0px #dc2626' }}>
                 Welcome to <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-rose-200 drop-shadow-md">
-                  Kirei Chisa
-                </span>
+                <span className="text-red-500">Kirei Chisa</span>
               </h1>
-              <p className="text-rose-50 text-sm sm:text-base md:text-lg max-w-2xl mx-auto font-medium leading-relaxed mb-6 drop-shadow-md">
+              <p className="text-zinc-300 text-sm sm:text-base max-w-lg font-mono mb-8 border-l-2 border-red-600 pl-4 bg-zinc-950/30 p-2 backdrop-blur-sm">
+                [DATA_LINK_ESTABLISHED] <br/><br/>
                 Platform jual beli akun premium, OTP virtual, dan Top-Up PPOB terlengkap. 
-                Transaksi cepat, aman, dan otomatis 24/7.
+                Transaksi cepat, aman, 24/7.
               </p>
               
-              <Link href="#layanan" className="px-8 py-3 bg-white/20 hover:bg-white/30 border border-white/50 text-white rounded-full font-semibold backdrop-blur-md transition-all duration-300 flex items-center gap-2 hover:gap-3 shadow-[0_0_20px_rgba(244,63,94,0.2)]">
-                Jelajahi Layanan <ArrowRight size={18} />
+              <Link href="#layanan" className="w-fit px-8 py-3 bg-red-600 hover:bg-red-500 text-white font-bold font-mono tracking-widest uppercase transition-all duration-200 border border-red-400 hover:border-white shadow-[0_0_15px_rgba(220,38,38,0.5)] flex items-center gap-3 group">
+                Initialize <ArrowRight size={18} className="group-hover:translate-x-2 transition-transform" />
               </Link>
             </div>
           </div>
@@ -60,65 +67,74 @@ export default function HomePage() {
         </section>
 
         {/* Services */}
-        <section id="layanan" className="max-w-5xl mx-auto px-4 sm:px-6 py-12">
-          <div className="text-center mb-10">
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900">Layanan Unggulan</h2>
-            <p className="text-gray-500 mt-2">Pilih layanan yang kamu butuhkan hari ini</p>
+        <section id="layanan" className="max-w-5xl mx-auto px-4 sm:px-6 py-16">
+          <div className="mb-10 border-b-2 border-zinc-800 pb-4 flex items-end justify-between">
+            <div>
+              <h2 className="text-3xl font-black text-white uppercase tracking-tight">Database Layanan</h2>
+              <p className="text-red-500 font-mono text-xs mt-1">>> Select your module_</p>
+            </div>
+            <Crosshair className="text-red-600/50 animate-[spin_4s_linear_infinite]" size={32} />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Premku Card */}
-            <Link href="/premku" className="group bg-white/80 backdrop-blur-xl border border-white shadow-xl shadow-rose-900/5 rounded-3xl p-6 hover:-translate-y-2 hover:shadow-rose-500/10 transition-all duration-300 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-rose-500/5 rounded-bl-full -z-10 transition-transform group-hover:scale-110" />
-              <div className="flex items-start gap-4">
-                <div className="w-14 h-14 bg-gradient-to-br from-rose-400 to-red-400 rounded-2xl flex items-center justify-center shadow-lg shadow-rose-500/20 flex-shrink-0">
-                  <ShoppingBag size={24} className="text-white" />
+            <Link href="/premku" className="group bg-zinc-900/50 border border-zinc-800 hover:border-red-600 p-6 relative overflow-hidden transition-all duration-300">
+              <div className="absolute top-0 right-0 w-16 h-16 bg-red-600/10 blur-xl group-hover:bg-red-600/30 transition-colors" />
+              <div className="absolute -bottom-px left-0 w-0 h-1 bg-red-600 group-hover:w-full transition-all duration-300" />
+              
+              <div className="flex items-start gap-4 relative z-10">
+                <div className="w-12 h-12 bg-zinc-950 border border-zinc-700 group-hover:border-red-500 flex items-center justify-center flex-shrink-0 transition-colors">
+                  <ShoppingBag size={20} className="text-red-500" />
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-bold text-gray-900 text-xl">Premku</h3>
-                    <span className="bg-rose-50 text-rose-600 text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-wide border border-rose-100">Tersedia</span>
+                    <h3 className="font-bold text-white text-lg uppercase tracking-wide">Premku</h3>
+                    <span className="bg-red-600/10 text-red-500 border border-red-600/30 text-[10px] font-mono px-2 py-0.5 uppercase">Active</span>
                   </div>
-                  <p className="text-sm text-gray-500 leading-relaxed">
-                    Akun premium Netflix, Spotify, Canva, dll. Harga pelajar, stok selalu ready.
+                  <p className="text-zinc-400 leading-relaxed font-mono text-xs">
+                    Akun premium Netflix, Spotify, Canva. Harga pelajar, stok auto-sync.
                   </p>
                 </div>
               </div>
             </Link>
 
             {/* Nokos Card */}
-            <Link href="/nokos" className="group bg-white/80 backdrop-blur-xl border border-white shadow-xl shadow-rose-900/5 rounded-3xl p-6 hover:-translate-y-2 hover:shadow-rose-500/10 transition-all duration-300 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-red-500/5 rounded-bl-full -z-10 transition-transform group-hover:scale-110" />
-              <div className="flex items-start gap-4">
-                <div className="w-14 h-14 bg-gradient-to-br from-red-400 to-rose-500 rounded-2xl flex items-center justify-center shadow-lg shadow-red-500/20 flex-shrink-0">
-                  <Phone size={24} className="text-white" />
+            <Link href="/nokos" className="group bg-zinc-900/50 border border-zinc-800 hover:border-white p-6 relative overflow-hidden transition-all duration-300">
+              <div className="absolute top-0 right-0 w-16 h-16 bg-white/5 blur-xl group-hover:bg-white/10 transition-colors" />
+              <div className="absolute -bottom-px left-0 w-0 h-1 bg-white group-hover:w-full transition-all duration-300" />
+              
+              <div className="flex items-start gap-4 relative z-10">
+                <div className="w-12 h-12 bg-zinc-950 border border-zinc-700 group-hover:border-white flex items-center justify-center flex-shrink-0 transition-colors">
+                  <Phone size={20} className="text-white" />
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-bold text-gray-900 text-xl">Nokos OTP</h3>
-                    <span className="bg-red-50 text-red-600 text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-wide border border-red-100">Realtime</span>
+                    <h3 className="font-bold text-white text-lg uppercase tracking-wide">Nokos OTP</h3>
+                    <span className="bg-white/5 text-white border border-white/30 text-[10px] font-mono px-2 py-0.5 uppercase">Realtime</span>
                   </div>
-                  <p className="text-sm text-gray-500 leading-relaxed">
-                    Nomor virtual luar negeri untuk verifikasi OTP WA, Tele, FB, dan lainnya.
+                  <p className="text-zinc-400 leading-relaxed font-mono text-xs">
+                    Nomor virtual luar negeri untuk verifikasi OTP WA, Tele, FB, dll.
                   </p>
                 </div>
               </div>
             </Link>
 
             {/* PPOB Card */}
-            <Link href="/ppob" className="group bg-white/80 backdrop-blur-xl border border-white shadow-xl shadow-rose-900/5 rounded-3xl p-6 hover:-translate-y-2 hover:shadow-rose-500/10 transition-all duration-300 relative overflow-hidden sm:col-span-2 lg:col-span-1">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-pink-500/5 rounded-bl-full -z-10 transition-transform group-hover:scale-110" />
-              <div className="flex items-start gap-4">
-                <div className="w-14 h-14 bg-gradient-to-br from-pink-400 to-rose-400 rounded-2xl flex items-center justify-center shadow-lg shadow-pink-500/20 flex-shrink-0">
-                  <Zap size={24} className="text-white" />
+            <Link href="/ppob" className="group bg-zinc-900/50 border border-zinc-800 hover:border-red-600 p-6 relative overflow-hidden transition-all duration-300 sm:col-span-2 lg:col-span-1">
+              <div className="absolute top-0 right-0 w-16 h-16 bg-red-600/10 blur-xl group-hover:bg-red-600/30 transition-colors" />
+              <div className="absolute -bottom-px left-0 w-0 h-1 bg-red-600 group-hover:w-full transition-all duration-300" />
+              
+              <div className="flex items-start gap-4 relative z-10">
+                <div className="w-12 h-12 bg-zinc-950 border border-zinc-700 group-hover:border-red-500 flex items-center justify-center flex-shrink-0 transition-colors">
+                  <Zap size={20} className="text-red-500" />
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-bold text-gray-900 text-xl">PPOB</h3>
-                    <span className="bg-pink-50 text-pink-600 text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-wide border border-pink-100">Top Up</span>
+                    <h3 className="font-bold text-white text-lg uppercase tracking-wide">PPOB</h3>
+                    <span className="bg-red-600/10 text-red-500 border border-red-600/30 text-[10px] font-mono px-2 py-0.5 uppercase">Top Up</span>
                   </div>
-                  <p className="text-sm text-gray-500 leading-relaxed">
-                    Top up Game (FF, MLBB), E-Wallet (DANA, OVO), dan pulsa semua operator.
+                  <p className="text-zinc-400 leading-relaxed font-mono text-xs">
+                    Top up Game (FF, MLBB), E-Wallet (DANA, OVO), dan pulsa all operator.
                   </p>
                 </div>
               </div>
@@ -127,24 +143,30 @@ export default function HomePage() {
         </section>
 
         {/* Features */}
-        <section className="max-w-5xl mx-auto px-4 sm:px-6 pb-12">
-          <div className="bg-white/90 backdrop-blur-xl border border-white rounded-[2rem] p-8 sm:p-10 shadow-xl shadow-rose-900/5">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-gray-900">Kenapa Memilih Kami?</h2>
+        <section className="max-w-5xl mx-auto px-4 sm:px-6 pb-16">
+          <div className="bg-zinc-900/80 border border-zinc-800 p-8 sm:p-10 relative">
+            {/* Tech Corners Component */}
+            <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-red-600"></div>
+            <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-red-600"></div>
+            
+            <div className="text-center mb-10">
+              <h2 className="text-2xl font-black text-white uppercase tracking-widest">System Specs</h2>
+              <div className="w-16 h-1 bg-red-600 mx-auto mt-4 shadow-[0_0_10px_rgba(220,38,38,0.8)]"></div>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+            
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-8">
               {[
-                { icon: Zap, label: 'Instan 24/7', desc: 'Proses otomatis', color: 'from-rose-400 to-red-400', shadow: 'shadow-red-500/10' },
-                { icon: Shield, label: 'Terjamin Aman', desc: 'Sistem enkripsi', color: 'from-red-400 to-rose-500', shadow: 'shadow-rose-500/10' },
-                { icon: Clock, label: 'Stok Realtime', desc: 'Selalu update', color: 'from-pink-400 to-rose-400', shadow: 'shadow-pink-500/10' },
-                { icon: Star, label: 'Harga Miring', desc: 'Super kompetitif', color: 'from-rose-300 to-red-400', shadow: 'shadow-red-500/10' },
-              ].map(({ icon: Icon, label, desc, color, shadow }) => (
+                { icon: Zap, label: 'Instan 24/7', desc: 'Auto_Execution' },
+                { icon: Shield, label: 'Secure', desc: 'Encrypted_Data' },
+                { icon: Clock, label: 'Realtime', desc: 'Live_Sync' },
+                { icon: Star, label: 'Best Price', desc: 'Low_Cost' },
+              ].map(({ icon: Icon, label, desc }) => (
                 <div key={label} className="flex flex-col items-center text-center group">
-                  <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${color} ${shadow} shadow-lg flex items-center justify-center mb-4 transition-transform group-hover:-translate-y-1`}>
-                    <Icon size={26} className="text-white" />
+                  <div className={`w-16 h-16 bg-zinc-950 border border-zinc-700 group-hover:border-red-500 group-hover:shadow-[0_0_15px_rgba(220,38,38,0.4)] flex items-center justify-center mb-4 transition-all duration-300 transform group-hover:-translate-y-2`}>
+                    <Icon size={24} className="text-white group-hover:text-red-500 transition-colors" />
                   </div>
-                  <p className="font-bold text-gray-900 text-sm mb-1">{label}</p>
-                  <p className="text-xs text-gray-500">{desc}</p>
+                  <p className="font-bold text-white text-sm uppercase tracking-wide mb-1">{label}</p>
+                  <p className="text-xs text-red-500 font-mono tracking-wider">{desc}</p>
                 </div>
               ))}
             </div>
