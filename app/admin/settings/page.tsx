@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import { Save, Plus, Trash2 } from 'lucide-react';
+import { Save, Plus, Trash2, Settings, TerminalSquare, Crosshair, Link as LinkIcon, Database } from 'lucide-react';
 import ImageUpload from '@/components/ImageUpload';
 
 interface Socials { telegram: string; tiktok: string; whatsapp: string; whatsapp_channel: string; }
@@ -33,7 +33,7 @@ export default function AdminSettingsPage() {
       body: JSON.stringify({ key, value }),
     });
     const d = await res.json();
-    if (d.success) toast.success(label + ' tersimpan!'); else toast.error(d.message);
+    if (d.success) toast.success(`[${label.toUpperCase()}] Config Updated.`); else toast.error(`Sys_Error: ${d.message}`);
     setSaving(null);
   };
 
@@ -42,69 +42,139 @@ export default function AdminSettingsPage() {
   const updateFaq = (i: number, f: 'question' | 'answer', v: string) =>
     setFaqs(p => p.map((item, x) => x === i ? { ...item, [f]: v } : item));
 
-  if (loading) return <div className="flex justify-center pt-16"><div className="spinner spinner-brand scale-150" /></div>;
+  if (loading) return (
+    <div className="flex flex-col items-center justify-center pt-32">
+      <Crosshair size={40} className="text-red-600 animate-[spin_4s_linear_infinite] mb-4" />
+      <p className="font-mono text-xs text-red-500 uppercase tracking-widest animate-pulse">Loading_Config_Data...</p>
+    </div>
+  );
 
   return (
-    <div className="space-y-6 max-w-2xl">
-      <h1 className="text-lg font-black text-gray-900">Pengaturan ⚙️</h1>
-
-      <div className="bg-white rounded-3xl p-5 shadow-sm border border-pink-100 space-y-4">
-        <h2 className="font-black text-gray-900">Logo Website</h2>
-        <ImageUpload value={logo} onChange={setLogo} label="Upload Logo (tampil di navbar)" aspectRatio="1/1" maxSizeMB={1} />
-        <p className="text-xs text-gray-400">Rekomendasi: ukuran kotak 1:1, PNG transparan, maks 1MB</p>
-        <button onClick={() => save('logo', logo, 'Logo')} disabled={saving === 'logo'} className="btn-primary py-2.5 text-sm">
-          {saving === 'logo' ? <span className="spinner" /> : <><Save size={14} />Simpan Logo</>}
-        </button>
-      </div>
-
-      <div className="bg-white rounded-3xl p-5 shadow-sm border border-pink-100 space-y-3">
-        <h2 className="font-black text-gray-900">Biaya Admin QRIS</h2>
-        <p className="text-xs text-gray-400">Fee % ditambahkan ke nominal deposit user. Contoh: 2% → Rp100.000 jadi Rp102.000</p>
-        <div className="flex gap-2 items-center">
-          <input type="number" min="0" max="10" step="0.1" className="input w-32" value={qrisFee} onChange={e => setQrisFee(e.target.value)} />
-          <span className="text-sm text-gray-500 font-bold">%</span>
+    <div className="space-y-6 max-w-3xl">
+      {/* Header */}
+      <div className="border-b border-zinc-800 pb-4 mb-6">
+        <div className="flex items-center gap-3 mb-1">
+          <Settings className="text-red-500" size={28} />
+          <h1 className="text-2xl font-black text-white uppercase tracking-widest" style={{ textShadow: '2px 2px 0px #dc2626' }}>
+            Sys_Settings
+          </h1>
         </div>
-        <button onClick={() => save('qris_fee_percent', parseFloat(qrisFee) || 0, 'Fee QRIS')} disabled={saving === 'qris_fee_percent'} className="btn-primary py-2.5 text-sm">
-          {saving === 'qris_fee_percent' ? <span className="spinner" /> : <><Save size={14} />Simpan Fee</>}
-        </button>
+        <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest pl-10">
+          {'>>'} Core Configuration Module
+        </p>
       </div>
 
-      <div className="bg-white rounded-3xl p-5 shadow-sm border border-pink-100 space-y-4">
-        <h2 className="font-black text-gray-900">Link Media Sosial</h2>
-        {([['telegram','✈️ Telegram','https://t.me/...'],['tiktok','🎵 TikTok','https://tiktok.com/@...'],['whatsapp','💬 WhatsApp','https://wa.me/628...'],['whatsapp_channel','📢 Saluran WA','https://whatsapp.com/channel/...']] as [keyof Socials, string, string][]).map(([k, l, p]) => (
-          <div key={k}>
-            <label className="label">{l}</label>
-            <input className="input" placeholder={p} value={socials[k]} onChange={e => setSocials(s => ({ ...s, [k]: e.target.value }))} />
+      {/* Box 1: Web Logo */}
+      <div className="bg-zinc-900 border border-zinc-800 p-6 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-red-600"></div>
+        <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-red-600"></div>
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0)_50%,rgba(0,0,0,0.1)_50%)] bg-[length:100%_4px] pointer-events-none opacity-30 z-0" />
+        
+        <div className="relative z-10 space-y-4">
+          <h2 className="text-sm font-black font-mono text-white uppercase tracking-widest border-b border-zinc-800 pb-2 flex items-center gap-2">
+            <TerminalSquare size={16} className="text-red-500" /> Identity_Graphic
+          </h2>
+          <div className="bg-zinc-950 border border-zinc-800 p-4">
+            <ImageUpload value={logo} onChange={setLogo} label="Upload Image Asset (Navbar Display)" aspectRatio="1/1" maxSizeMB={1} />
           </div>
-        ))}
-        <button onClick={() => save('socials', socials, 'Link sosmed')} disabled={saving === 'socials'} className="btn-primary py-2.5 text-sm">
-          {saving === 'socials' ? <span className="spinner" /> : <><Save size={14} />Simpan Sosmed</>}
-        </button>
+          <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">{'>>'} Specs: 1:1 Ratio, Transparent PNG, Max 1MB</p>
+          <button onClick={() => save('logo', logo, 'Logo')} disabled={saving === 'logo'} className="py-3 px-6 bg-red-600 hover:bg-red-500 text-white font-mono font-bold uppercase tracking-widest border border-red-500 shadow-[0_0_15px_rgba(220,38,38,0.3)] transition-all flex items-center justify-center gap-2">
+            {saving === 'logo' ? <span className="spinner border-white/30 border-t-white" /> : <><Save size={14} /> Execute_Save</>}
+          </button>
+        </div>
       </div>
 
-      <div className="bg-white rounded-3xl p-5 shadow-sm border border-pink-100 space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="font-black text-gray-900">FAQ</h2>
-          <button onClick={addFaq} className="btn-secondary py-1.5 px-3 text-sm"><Plus size={14} />Tambah</button>
+      {/* Box 2: QRIS Fee */}
+      <div className="bg-zinc-900 border border-zinc-800 p-6 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-amber-600"></div>
+        <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-amber-600"></div>
+        
+        <div className="relative z-10 space-y-4">
+          <h2 className="text-sm font-black font-mono text-white uppercase tracking-widest border-b border-zinc-800 pb-2 flex items-center gap-2">
+            <Database size={16} className="text-amber-500" /> Network_Fee_Config (QRIS)
+          </h2>
+          <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">{'>>'} Dynamic % added to base injection amount. Example: 2% -{'>'} 100k becomes 102k.</p>
+          <div className="flex gap-3 items-center">
+            <div className="relative">
+              <input type="number" min="0" max="10" step="0.1" className="bg-zinc-950 border border-zinc-800 focus:border-amber-500 focus:shadow-[0_0_10px_rgba(245,158,11,0.2)] text-white font-mono font-black text-lg px-4 py-2 outline-none transition-all w-32" value={qrisFee} onChange={e => setQrisFee(e.target.value)} />
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 font-mono font-bold">%</span>
+            </div>
+            <button onClick={() => save('qris_fee_percent', parseFloat(qrisFee) || 0, 'Fee QRIS')} disabled={saving === 'qris_fee_percent'} className="py-2.5 px-6 bg-amber-950/50 hover:bg-amber-900/50 text-amber-500 font-mono font-bold uppercase tracking-widest border border-amber-900/50 transition-all flex items-center justify-center gap-2">
+              {saving === 'qris_fee_percent' ? <span className="spinner border-amber-500/30 border-t-amber-500" /> : <><Save size={14} /> Set_Parameter</>}
+            </button>
+          </div>
         </div>
-        {faqs.length === 0 ? <p className="text-sm text-gray-400 text-center py-4">Belum ada FAQ.</p> : (
-          <div className="space-y-3">
-            {faqs.map((faq, i) => (
-              <div key={i} className="border-2 border-pink-50 rounded-2xl p-3 space-y-2">
-                <div className="flex gap-2">
-                  <div className="flex-1 space-y-2">
-                    <input className="input text-sm" placeholder="Pertanyaan" value={faq.question} onChange={e => updateFaq(i, 'question', e.target.value)} />
-                    <textarea className="input text-sm resize-none" rows={2} placeholder="Jawaban" value={faq.answer} onChange={e => updateFaq(i, 'answer', e.target.value)} />
-                  </div>
-                  <button onClick={() => removeFaq(i)} className="p-1.5 text-gray-300 hover:text-red-500 transition-colors flex-shrink-0 mt-1"><Trash2 size={14} /></button>
-                </div>
+      </div>
+
+      {/* Box 3: Social Links */}
+      <div className="bg-zinc-900 border border-zinc-800 p-6 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-blue-600"></div>
+        <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-blue-600"></div>
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0)_50%,rgba(0,0,0,0.1)_50%)] bg-[length:100%_4px] pointer-events-none opacity-30 z-0" />
+        
+        <div className="relative z-10 space-y-5">
+          <h2 className="text-sm font-black font-mono text-white uppercase tracking-widest border-b border-zinc-800 pb-2 flex items-center gap-2">
+            <LinkIcon size={16} className="text-blue-500" /> Comm_Channels_Config
+          </h2>
+          <div className="space-y-4">
+            {([['telegram','Telegram_Node','https://t.me/...'],['tiktok','TikTok_Feed','https://tiktok.com/@...'],['whatsapp','WhatsApp_Direct','https://wa.me/628...'],['whatsapp_channel','WhatsApp_Broadcast','https://whatsapp.com/channel/...']] as [keyof Socials, string, string][]).map(([k, l, p]) => (
+              <div key={k}>
+                <label className="block text-[10px] font-mono text-zinc-400 uppercase tracking-widest mb-1.5">{'>>'} {l}</label>
+                <input className="w-full bg-zinc-950 border border-zinc-800 focus:border-blue-500 text-white font-mono text-xs px-4 py-2.5 outline-none transition-all placeholder-zinc-700" placeholder={p} value={socials[k]} onChange={e => setSocials(s => ({ ...s, [k]: e.target.value }))} />
               </div>
             ))}
           </div>
-        )}
-        <button onClick={() => save('faqs', faqs, 'FAQ')} disabled={saving === 'faqs'} className="btn-primary py-2.5 text-sm">
-          {saving === 'faqs' ? <span className="spinner" /> : <><Save size={14} />Simpan FAQ</>}
-        </button>
+          <button onClick={() => save('socials', socials, 'Comm Links')} disabled={saving === 'socials'} className="py-3 px-6 bg-blue-950/30 hover:bg-blue-900/50 text-blue-400 font-mono font-bold uppercase tracking-widest border border-blue-900/50 transition-all flex items-center justify-center gap-2 w-full sm:w-auto">
+            {saving === 'socials' ? <span className="spinner border-blue-500/30 border-t-blue-500" /> : <><Save size={14} /> Execute_Save</>}
+          </button>
+        </div>
+      </div>
+
+      {/* Box 4: FAQs */}
+      <div className="bg-zinc-900 border border-zinc-800 p-6 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-emerald-600"></div>
+        <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-emerald-600"></div>
+        
+        <div className="relative z-10 space-y-5">
+          <div className="flex items-center justify-between border-b border-zinc-800 pb-2">
+            <h2 className="text-sm font-black font-mono text-white uppercase tracking-widest flex items-center gap-2">
+              <TerminalSquare size={16} className="text-emerald-500" /> FAQ_Database
+            </h2>
+            <button onClick={addFaq} className="px-3 py-1.5 bg-emerald-950/30 hover:bg-emerald-900/50 text-emerald-500 font-mono text-[10px] uppercase tracking-widest border border-emerald-900/50 transition-all flex items-center gap-1.5">
+              <Plus size={12} /> Add_Query
+            </button>
+          </div>
+
+          {faqs.length === 0 ? (
+            <p className="text-[10px] font-mono text-zinc-500 text-center py-6 border border-dashed border-zinc-800 uppercase tracking-widest">{'>>'} DATA_NOT_FOUND</p>
+          ) : (
+            <div className="space-y-4">
+              {faqs.map((faq, i) => (
+                <div key={i} className="border border-zinc-800 bg-zinc-950 p-4 space-y-3 relative group">
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <div className="flex-1 space-y-3">
+                      <div>
+                        <label className="block text-[10px] font-mono text-emerald-500 uppercase tracking-widest mb-1.5">Query_String</label>
+                        <input className="w-full bg-zinc-900 border border-zinc-800 focus:border-emerald-500 text-white font-mono text-xs px-3 py-2 outline-none transition-all placeholder-zinc-700" placeholder="Query input..." value={faq.question} onChange={e => updateFaq(i, 'question', e.target.value)} />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-mono text-emerald-500 uppercase tracking-widest mb-1.5">Response_Data</label>
+                        <textarea className="w-full bg-zinc-900 border border-zinc-800 focus:border-emerald-500 text-white font-mono text-xs px-3 py-2 outline-none transition-all resize-none placeholder-zinc-700" rows={3} placeholder="Response input..." value={faq.answer} onChange={e => updateFaq(i, 'answer', e.target.value)} />
+                      </div>
+                    </div>
+                    <button onClick={() => removeFaq(i)} className="sm:mt-5 p-2 h-fit bg-red-950/20 text-red-500 hover:bg-red-900/50 border border-red-900/30 transition-colors flex-shrink-0 flex items-center justify-center">
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+          
+          <button onClick={() => save('faqs', faqs, 'FAQ')} disabled={saving === 'faqs'} className="py-3 px-6 bg-emerald-950/30 hover:bg-emerald-900/50 text-emerald-400 font-mono font-bold uppercase tracking-widest border border-emerald-900/50 transition-all flex items-center justify-center gap-2 w-full sm:w-auto mt-4">
+            {saving === 'faqs' ? <span className="spinner border-emerald-500/30 border-t-emerald-500" /> : <><Save size={14} /> Execute_Save</>}
+          </button>
+        </div>
       </div>
     </div>
   );
