@@ -50,20 +50,20 @@ export default function DashboardPage() {
     if (data.success) {
       if (data.order.status !== 'active') {
         setNokosActive(prev => prev.filter(o => o.orderId !== orderId));
-        if (data.order.status === 'completed') toast.success(`OTP Decrypted: ${data.order.otpCode}`);
-        else if (data.order.status === 'expired') { toast('Session Expired. Credits Restored.'); fetchData(); }
-      } else { toast('Awaiting Data... Please wait.'); }
+        if (data.order.status === 'completed') toast.success(`OTP Berhasil: ${data.order.otpCode}`);
+        else if (data.order.status === 'expired') { toast('Sesi Kedaluwarsa. Saldo Dikembalikan.'); fetchData(); }
+      } else { toast('Menunggu Data... Mohon tunggu.'); }
     }
   };
 
   const cancelNokos = async (orderId: string) => {
-    if (!confirm('Abort this operation?')) return;
+    if (!confirm('Batalkan pesanan ini?')) return;
     const res = await fetch('/api/nokos/order-cancel', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ orderId }),
     });
     const data = await res.json();
-    if (data.success) { toast.success('Operation Aborted.'); fetchData(); }
+    if (data.success) { toast.success('Pesanan Dibatalkan.'); fetchData(); }
     else toast.error(data.message);
   };
 
@@ -93,11 +93,11 @@ export default function DashboardPage() {
             <div className="flex items-center gap-3 mb-1">
               <Crosshair className="text-red-500 animate-[spin_4s_linear_infinite]" size={28} />
               <h1 className="text-3xl font-black text-white uppercase tracking-tight" style={{ textShadow: '2px 2px 0px #dc2626' }}>
-                User Dashboard
+                Dashboard User
               </h1>
             </div>
             <p className="text-zinc-400 font-mono text-xs pl-10">
-              Welcome back, <span className="text-red-500 font-bold uppercase tracking-wider">[{user?.username || 'GUEST'}]</span>
+              Selamat datang kembali, <span className="text-red-500 font-bold uppercase tracking-wider">[{user?.username || 'TAMU'}]</span>
             </p>
           </div>
           <ServerStatus />
@@ -111,7 +111,7 @@ export default function DashboardPage() {
             <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-red-500"></div>
             
             <p className="text-xs text-zinc-400 font-mono uppercase tracking-widest mb-2 flex items-center gap-2">
-              <ShoppingBag size={14} className="text-red-500" /> Premku Credits
+              <ShoppingBag size={14} className="text-red-500" /> Saldo Premku
             </p>
             <p className="text-3xl font-black text-white drop-shadow-[0_0_8px_rgba(220,38,38,0.5)] mb-4">
               {user ? formatRupiah(user.premkuBalance) : '—'}
@@ -127,7 +127,7 @@ export default function DashboardPage() {
             <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-white/50"></div>
             
             <p className="text-xs text-zinc-400 font-mono uppercase tracking-widest mb-2 flex items-center gap-2">
-              <Phone size={14} className="text-white" /> Nokos Credits
+              <Phone size={14} className="text-white" /> Saldo Nokos
             </p>
             <p className="text-3xl font-black text-white mb-4">
               {user ? formatRupiah(user.nokosBalance) : '—'}
@@ -141,9 +141,9 @@ export default function DashboardPage() {
         {/* Quick Actions */}
         <div className="grid grid-cols-3 gap-4 mb-10">
           {[
-            { href: '/premku', icon: ShoppingBag, label: 'Premku_DB', color: 'text-red-500 group-hover:text-white', bgHover: 'hover:bg-red-600', borderHover: 'hover:border-red-500' },
-            { href: '/nokos', icon: Phone, label: 'Nokos_OTP', color: 'text-white group-hover:text-zinc-950', bgHover: 'hover:bg-white', borderHover: 'hover:border-white' },
-            { href: '/history', icon: History, label: 'Sys_History', color: 'text-zinc-400 group-hover:text-white', bgHover: 'hover:bg-zinc-800', borderHover: 'hover:border-zinc-600' },
+            { href: '/premku', icon: ShoppingBag, label: 'Katalog Premku', color: 'text-red-500 group-hover:text-white', bgHover: 'hover:bg-red-600', borderHover: 'hover:border-red-500' },
+            { href: '/nokos', icon: Phone, label: 'Nomor OTP', color: 'text-white group-hover:text-zinc-950', bgHover: 'hover:bg-white', borderHover: 'hover:border-white' },
+            { href: '/history', icon: History, label: 'Riwayat', color: 'text-zinc-400 group-hover:text-white', bgHover: 'hover:bg-zinc-800', borderHover: 'hover:border-zinc-600' },
           ].map(({ href, icon: Icon, label, color, bgHover, borderHover }) => (
             <Link key={href} href={href} className={`card-product flex flex-col items-center justify-center gap-3 py-6 group ${bgHover} ${borderHover} transition-all duration-300`}>
               <Icon size={24} className={`${color} transition-colors`} />
@@ -157,7 +157,7 @@ export default function DashboardPage() {
           <div className="mb-8">
             <h2 className="text-lg font-black text-white uppercase tracking-widest mb-4 flex items-center gap-3 border-b border-zinc-800 pb-2">
               <Zap size={20} className="text-red-500" />
-              Active Orders
+              Pesanan Aktif
               <span className="bg-red-600/20 border border-red-500/50 text-red-500 font-mono text-xs px-2 py-0.5">{nokosActive.length}</span>
             </h2>
             <div className="space-y-4">
@@ -173,17 +173,17 @@ export default function DashboardPage() {
                           <p className="font-bold text-white uppercase tracking-wide text-sm">{order.serviceName} // {order.countryName}</p>
                         </div>
                         <p className="font-mono text-red-400 font-black text-lg tracking-widest mb-3 bg-zinc-950 w-fit px-3 py-1 border border-zinc-800">{order.phoneNumber}</p>
-                        <CountdownTimer expiresAt={order.expiresAt} label="Timeout" onExpire={() => checkNokosStatus(order.orderId)} />
+                        <CountdownTimer expiresAt={order.expiresAt} label="Waktu Habis" onExpire={() => checkNokosStatus(order.orderId)} />
                       </div>
                       <div className="flex sm:flex-col gap-2 w-full sm:w-auto mt-2 sm:mt-0">
                         <button onClick={() => checkNokosStatus(order.orderId)}
                           className="flex-1 sm:flex-none flex items-center justify-center gap-2 text-xs font-mono font-bold bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-700 px-4 py-2 transition-colors uppercase">
-                          <RefreshCw size={14} /> REFRESH
+                          <RefreshCw size={14} /> Refresh Data
                         </button>
                         {canCancel && (
                           <button onClick={() => cancelNokos(order.orderId)}
                             className="flex-1 sm:flex-none flex items-center justify-center gap-2 text-xs font-mono font-bold bg-red-950/50 hover:bg-red-900/80 text-red-500 border border-red-900 px-4 py-2 transition-colors uppercase">
-                            <X size={14} /> Abort
+                            <X size={14} /> Batalkan
                           </button>
                         )}
                       </div>
@@ -200,7 +200,7 @@ export default function DashboardPage() {
           <div className="mb-8">
             <h2 className="text-lg font-black text-white uppercase tracking-widest mb-4 flex items-center gap-3 border-b border-zinc-800 pb-2">
               <TerminalSquare size={20} className="text-amber-500" />
-              Pending_Queues
+              Proses Tertunda
               <span className="bg-amber-600/20 border border-amber-500/50 text-amber-500 font-mono text-xs px-2 py-0.5">{premkuPending.length}</span>
             </h2>
             <div className="space-y-4">
@@ -209,11 +209,11 @@ export default function DashboardPage() {
                   <div>
                     <p className="font-bold text-white uppercase text-sm mb-1">{order.productName}</p>
                     <p className="text-xs text-zinc-500 font-mono mb-2">ID: {order.invoice}</p>
-                    <span className="badge-pending animate-pulse">Processing_Data</span>
+                    <span className="text-[10px] font-mono bg-amber-950/30 text-amber-500 border border-amber-900/50 px-2 py-0.5 uppercase tracking-widest animate-pulse">Sedang Diproses</span>
                   </div>
                   <button onClick={() => checkPremkuStatus(order.invoice)}
                     className="flex items-center justify-center gap-2 text-xs font-mono font-bold bg-amber-950/30 hover:bg-amber-900/50 text-amber-500 border border-amber-900/50 px-4 py-2 transition-colors uppercase flex-shrink-0">
-                    <RefreshCw size={14} /> Verify_Status
+                    <RefreshCw size={14} /> Cek Status
                   </button>
                 </div>
               ))}
@@ -226,11 +226,11 @@ export default function DashboardPage() {
           <div className="border border-dashed border-zinc-800 bg-zinc-900/30 text-center py-12 relative overflow-hidden">
             <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0)_50%,rgba(0,0,0,0.1)_50%)] bg-[length:100%_4px] pointer-events-none opacity-50" />
             <Crosshair size={40} className="mx-auto mb-4 text-zinc-700 animate-[spin_10s_linear_infinite]" />
-            <p className="font-mono text-zinc-400 uppercase tracking-widest text-sm mb-2">{'>>'} No_Active_Tasks</p>
-            <p className="text-xs text-zinc-600 font-mono mb-6">Initialize a new process from the database.</p>
+            <p className="font-mono text-zinc-400 uppercase tracking-widest text-sm mb-2">Tidak Ada Tugas Aktif</p>
+            <p className="text-xs text-zinc-600 font-mono mb-6">Mulai pesanan baru dari menu yang tersedia.</p>
             <div className="flex gap-4 justify-center relative z-10">
-              <Link href="/premku" className="btn-primary text-xs py-2 px-6">{'>>'} Premku</Link>
-              <Link href="/nokos" className="btn-secondary text-xs py-2 px-6">{'>>'} Nokos</Link>
+              <Link href="/premku" className="btn-primary text-xs py-2 px-6">Buka Premku</Link>
+              <Link href="/nokos" className="btn-secondary text-xs py-2 px-6">Buka Nokos</Link>
             </div>
           </div>
         )}
