@@ -8,8 +8,8 @@ export async function GET() {
     await connectDB();
 
     // Kamu bisa ganti email dan password ini sesuai keinginan
-    const email = 'tabrita556@gmail.com';
-    const password = 'test8687';
+    const email = 'ganzvlty@gmail.com';
+    const password = 'ganzvlty';
 
     const existing = await User.findOne({ email });
 
