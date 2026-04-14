@@ -11,7 +11,7 @@ type Tab = 'premku-orders' | 'nokos-orders' | 'premku-deposits' | 'nokos-deposit
 // Interfaces biar kode lebih bersih & gak error TypeScript
 interface Account { username: string; password: string; }
 interface PremkuOrder { _id: string; invoice: string; productName: string; total: number; status: string; createdAt: string; accounts?: Account[]; }
-interface NokosOrder { _id: string; orderId: string; phoneNumber: string; serviceName: string; countryName: string; price: number; status: string; otpCode?: string; createdAt: string; }
+interface NokosOrder { _id: string; orderId: string; phoneNumber: string; serviceName: string; countryName: string; price: string | number; status: string; otpCode?: string; createdAt: string; }
 interface PremkuDeposit { _id: string; invoice: string; amount: number; kodeUnik: number; status: string; createdAt: string; }
 interface NokosDeposit { _id: string; depositId: string; diterima: number; status: string; createdAt: string; }
 
@@ -40,14 +40,20 @@ export default function HistoryPage() {
       active: 'badge-active',
       failed: 'badge-failed', canceled: 'badge-failed', cancel: 'badge-failed', expired: 'badge-failed', 
     };
-    return <span className={map[status] || 'badge-pending'}>{status}</span>;
+    const labelMap: Record<string, string> = {
+      success: 'SUKSES', completed: 'SUKSES', confirmed: 'SUKSES',
+      pending: 'PENDING', processing: 'DIPROSES', refunded: 'DIKEMBALIKAN',
+      active: 'AKTIF',
+      failed: 'GAGAL', canceled: 'BATAL', cancel: 'BATAL', expired: 'KEDALUWARSA',
+    };
+    return <span className={map[status] || 'badge-pending'}>{labelMap[status] || status.toUpperCase()}</span>;
   };
 
   const checkPremkuOrder = async (invoice: string) => {
     const res = await fetch('/api/premku/order-status', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ invoice }) });
     const d = await res.json();
     if (d.success) {
-      toast(`System Log: ${d.order.status.toUpperCase()}`);
+      toast(`Log Sistem: ${d.order.status.toUpperCase()}`);
       setData(prev => ({ ...prev, premkuOrders: prev.premkuOrders.map(o => o.invoice === invoice ? { ...o, status: d.order.status, accounts: d.order.accounts } : o) }));
     }
   };
@@ -56,17 +62,17 @@ export default function HistoryPage() {
     const res = await fetch('/api/nokos/order-status', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ orderId }) });
     const d = await res.json();
     if (d.success) {
-      if (d.order.otpCode) toast.success(`Decrypted Key: ${d.order.otpCode}`);
-      else toast(`System Log: ${d.order.status.toUpperCase()}`);
+      if (d.order.otpCode) toast.success(`Kunci Dekripsi: ${d.order.otpCode}`);
+      else toast(`Log Sistem: ${d.order.status.toUpperCase()}`);
       setData(prev => ({ ...prev, nokosOrders: prev.nokosOrders.map(o => o.orderId === orderId ? { ...o, status: d.order.status, otpCode: d.order.otpCode } : o) }));
     }
   };
 
   const cancelNokosOrder = async (orderId: string) => {
-    if (!confirm('Abort this operation?')) return;
+    if (!confirm('Batalkan operasi ini?')) return;
     const res = await fetch('/api/nokos/order-cancel', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ orderId }) });
     const d = await res.json();
-    if (d.success) { toast.success('Operation Aborted.'); setData(prev => ({ ...prev, nokosOrders: prev.nokosOrders.map(o => o.orderId === orderId ? { ...o, status: 'canceled' } : o) })); }
+    if (d.success) { toast.success('Operasi Dibatalkan.'); setData(prev => ({ ...prev, nokosOrders: prev.nokosOrders.map(o => o.orderId === orderId ? { ...o, status: 'canceled' } : o) })); }
     else toast.error(d.message);
   };
 
@@ -74,37 +80,37 @@ export default function HistoryPage() {
     const res = await fetch('/api/premku/deposit-status', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ invoice }) });
     const d = await res.json();
     if (d.success) {
-      toast(d.deposit.status === 'success' ? 'Funds Injected!' : `System Log: ${d.deposit.status.toUpperCase()}`);
+      toast(d.deposit.status === 'success' ? 'Dana Masuk!' : `Log Sistem: ${d.deposit.status.toUpperCase()}`);
       setData(prev => ({ ...prev, premkuDeposits: prev.premkuDeposits.map(dep => dep.invoice === invoice ? { ...dep, status: d.deposit.status } : dep) }));
     }
   };
 
   const cancelPremkuDeposit = async (invoice: string) => {
-    if (!confirm('Cancel deposit sequence?')) return;
+    if (!confirm('Batalkan proses deposit?')) return;
     const res = await fetch('/api/premku/deposit-cancel', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ invoice }) });
     const d = await res.json();
-    if (d.success) { toast.success('Sequence canceled.'); setData(prev => ({ ...prev, premkuDeposits: prev.premkuDeposits.map(dep => dep.invoice === invoice ? { ...dep, status: 'canceled' } : dep) })); }
+    if (d.success) { toast.success('Proses dibatalkan.'); setData(prev => ({ ...prev, premkuDeposits: prev.premkuDeposits.map(dep => dep.invoice === invoice ? { ...dep, status: 'canceled' } : dep) })); }
     else toast.error(d.message);
   };
 
   const checkNokosDeposit = async (depositId: string) => {
     const res = await fetch('/api/nokos/deposit-status', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ depositId }) });
     const d = await res.json();
-    if (d.success) { toast(d.deposit.status === 'success' ? 'Funds Injected!' : `System Log: ${d.deposit.status.toUpperCase()}`); }
+    if (d.success) { toast(d.deposit.status === 'success' ? 'Dana Masuk!' : `Log Sistem: ${d.deposit.status.toUpperCase()}`); }
   };
 
   const cancelNokosDeposit = async (depositId: string) => {
-    if (!confirm('Cancel deposit sequence?')) return;
+    if (!confirm('Batalkan proses deposit?')) return;
     const res = await fetch('/api/nokos/deposit-cancel', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ depositId }) });
     const d = await res.json();
-    if (d.success) toast.success('Sequence canceled.'); else toast.error(d.message);
+    if (d.success) toast.success('Proses dibatalkan.'); else toast.error(d.message);
   };
 
   const tabs: { id: Tab; label: string; icon: React.ElementType }[] = [
-    { id: 'premku-orders', label: 'Premku Orders', icon: ShoppingBag },
-    { id: 'nokos-orders', label: 'Nokos Orders', icon: Phone },
-    { id: 'premku-deposits', label: 'Premku Funds', icon: CreditCard },
-    { id: 'nokos-deposits', label: 'Nokos Funds', icon: CreditCard },
+    { id: 'premku-orders', label: 'Pesanan Premku', icon: ShoppingBag },
+    { id: 'nokos-orders', label: 'Pesanan Nokos', icon: Phone },
+    { id: 'premku-deposits', label: 'Deposit Premku', icon: CreditCard },
+    { id: 'nokos-deposits', label: 'Deposit Nokos', icon: CreditCard },
   ];
 
   return (
@@ -120,10 +126,10 @@ export default function HistoryPage() {
           <div className="flex items-center gap-3 mb-1">
             <History className="text-red-500" size={28} />
             <h1 className="text-3xl font-black text-white uppercase tracking-tight" style={{ textShadow: '2px 2px 0px #dc2626' }}>
-              Sys_History
+              Riwayat Sistem
             </h1>
           </div>
-          <p className="text-zinc-500 font-mono text-xs pl-10">{'>>'} Transaction logs </p>
+          <p className="text-zinc-500 font-mono text-xs pl-10">{'>>'} Catatan Transaksi </p>
         </div>
 
         {/* Terminal Tabs */}
@@ -156,7 +162,7 @@ export default function HistoryPage() {
             {tab === 'premku-orders' && (
               data.premkuOrders.length === 0 ? (
                 <div className="border border-dashed border-zinc-800 bg-zinc-900/30 text-center py-12 font-mono text-zinc-500 uppercase text-xs tracking-widest">
-                  {'>>'} NO RECORDS FOUND
+                  {'>>'} TIDAK ADA DATA
                 </div>
               ) : data.premkuOrders.map((o) => (
                 <div key={o._id} className="bg-zinc-900 border border-zinc-800 hover:border-red-500/50 p-4 relative group transition-colors overflow-hidden">
@@ -168,16 +174,16 @@ export default function HistoryPage() {
                       <div className="flex items-center gap-3 flex-wrap">
                         <StatusBadge status={o.status} />
                         <span className="text-xs font-mono text-zinc-400">{fmtDate(o.createdAt)}</span>
-                        <span className="text-xs font-mono font-bold text-red-500">{formatRupiah(o.total)}</span>
+                        <span className="text-xs font-mono font-bold text-red-500">{formatRupiah(Number(o.total))}</span>
                       </div>
                       
                       {o.status === 'success' && o.accounts && o.accounts.length > 0 && (
                         <div className="mt-4 bg-emerald-950/20 border border-emerald-900/50 p-3 space-y-2">
-                          <p className="text-[10px] font-mono text-emerald-500 uppercase tracking-widest mb-1">Decrypted_Keys:</p>
+                          <p className="text-[10px] font-mono text-emerald-500 uppercase tracking-widest mb-1">Data Kredensial:</p>
                           {o.accounts.map((acc, i) => (
                             <div key={i} className="text-xs font-mono flex items-center justify-between gap-4 bg-emerald-950/50 px-2 py-1.5 border border-emerald-900/30">
-                              <span className="text-emerald-400 truncate">ID: {acc.username} <span className="text-zinc-600 mx-1">||</span> PASS: {acc.password}</span>
-                              <button onClick={() => { navigator.clipboard.writeText(`ID: ${acc.username} | PASS: ${acc.password}`); toast.success('Data Copied!'); }}
+                              <span className="text-emerald-400 truncate">ID: {acc.username} <span className="text-zinc-600 mx-1">||</span> SANDI: {acc.password}</span>
+                              <button onClick={() => { navigator.clipboard.writeText(`ID: ${acc.username} | PASS: ${acc.password}`); toast.success('Data Disalin!'); }}
                                 className="text-emerald-600 hover:text-emerald-400 transition-colors flex-shrink-0">
                                 <Copy size={14} />
                               </button>
@@ -199,7 +205,7 @@ export default function HistoryPage() {
             {tab === 'nokos-orders' && (
               data.nokosOrders.length === 0 ? (
                 <div className="border border-dashed border-zinc-800 bg-zinc-900/30 text-center py-12 font-mono text-zinc-500 uppercase text-xs tracking-widest">
-                  {'>>'} NO RECORDS FOUND
+                  {'>>'} TIDAK ADA DATA
                 </div>
               ) : data.nokosOrders.map((o) => (
                 <div key={o._id} className="bg-zinc-900 border border-zinc-800 hover:border-blue-500/50 p-4 relative group transition-colors overflow-hidden">
@@ -212,7 +218,7 @@ export default function HistoryPage() {
                       <div className="flex items-center gap-3 flex-wrap mt-2">
                         <StatusBadge status={o.status} />
                         <span className="text-xs font-mono text-zinc-400">{fmtDate(o.createdAt)}</span>
-                        <span className="text-xs font-mono font-bold text-blue-500">{formatRupiah(o.price)}</span>
+                        <span className="text-xs font-mono font-bold text-blue-500">{formatRupiah(Number(o.price))}</span>
                       </div>
                     </div>
                     <div className="flex flex-row sm:flex-col gap-2 w-full sm:w-auto">
@@ -223,7 +229,7 @@ export default function HistoryPage() {
                       {o.status === 'active' && (
                         <button onClick={() => cancelNokosOrder(o.orderId)}
                           className="flex-1 sm:flex-none text-xs font-mono uppercase tracking-widest flex items-center justify-center gap-2 bg-red-950/30 hover:bg-red-900/50 border border-red-900 text-red-500 px-4 py-2 transition-colors">
-                          <X size={14} /> Abort
+                          <X size={14} /> BATALKAN
                         </button>
                       )}
                     </div>
@@ -236,7 +242,7 @@ export default function HistoryPage() {
             {tab === 'premku-deposits' && (
               data.premkuDeposits.length === 0 ? (
                 <div className="border border-dashed border-zinc-800 bg-zinc-900/30 text-center py-12 font-mono text-zinc-500 uppercase text-xs tracking-widest">
-                  {'>>'} NO RECORDS FOUND
+                  {'>>'} TIDAK ADA DATA
                 </div>
               ) : data.premkuDeposits.map((d) => (
                 <div key={d._id} className="bg-zinc-900 border border-zinc-800 hover:border-red-500/50 p-4 relative transition-colors">
@@ -261,7 +267,7 @@ export default function HistoryPage() {
                       {d.status === 'pending' && (
                         <button onClick={() => cancelPremkuDeposit(d.invoice)} 
                           className="flex-1 sm:flex-none text-xs font-mono uppercase flex items-center justify-center gap-2 bg-red-950/30 hover:bg-red-900/50 border border-red-900 text-red-500 px-4 py-2 transition-colors">
-                          <X size={14} /> Abort
+                          <X size={14} /> BATALKAN
                         </button>
                       )}
                     </div>
@@ -274,7 +280,7 @@ export default function HistoryPage() {
             {tab === 'nokos-deposits' && (
               data.nokosDeposits.length === 0 ? (
                 <div className="border border-dashed border-zinc-800 bg-zinc-900/30 text-center py-12 font-mono text-zinc-500 uppercase text-xs tracking-widest">
-                  {'>>'} NO RECORDS FOUND
+                  {'>>'} TIDAK ADA DATA
                 </div>
               ) : data.nokosDeposits.map((d) => (
                 <div key={d._id} className="bg-zinc-900 border border-zinc-800 hover:border-blue-500/50 p-4 relative transition-colors">
@@ -293,12 +299,12 @@ export default function HistoryPage() {
                     <div className="flex flex-row sm:flex-col gap-2 w-full sm:w-auto mt-2 sm:mt-0">
                       <button onClick={() => checkNokosDeposit(d.depositId)}
                         className="flex-1 sm:flex-none text-xs font-mono uppercase flex items-center justify-center gap-2 bg-zinc-950 hover:bg-zinc-800 border border-zinc-700 text-zinc-300 px-4 py-2 transition-colors">
-                        <RefreshCw size={14} /> Ping
+                        <RefreshCw size={14} /> CEK STATUS
                       </button>
                       {d.status === 'pending' && (
                         <button onClick={() => cancelNokosDeposit(d.depositId)} 
                           className="flex-1 sm:flex-none text-xs font-mono uppercase flex items-center justify-center gap-2 bg-red-950/30 hover:bg-red-900/50 border border-red-900 text-red-500 px-4 py-2 transition-colors">
-                          <X size={14} /> Abort
+                          <X size={14} /> BATALKAN
                         </button>
                       )}
                     </div>
