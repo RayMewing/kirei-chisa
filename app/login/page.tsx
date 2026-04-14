@@ -22,14 +22,14 @@ export default function LoginPage() {
       const data = await res.json();
       if (!data.success) {
         if (res.status === 403) {
-          toast.error('Auth Failed: Node Unverified.');
+          toast.error('Otorisasi Gagal: Akun Belum Diverifikasi.');
           router.push(`/register?userId=${data.userId}`);
           return;
         }
-        toast.error(`Error: ${data.message}`);
+        toast.error(`Kesalahan: ${data.message}`);
         return;
       }
-      toast.success('System Access Granted!');
+      toast.success('Akses Sistem Diizinkan!');
       window.location.href = '/dashboard'; 
 
     } finally { setLoading(false); }
@@ -51,9 +51,9 @@ export default function LoginPage() {
             </div>
             <div>
               <h1 className="font-black text-white text-2xl uppercase tracking-[0.2em]" style={{ textShadow: '2px 2px 0px #dc2626' }}>
-                Kirei_Chisa
+                Kirei Chisa
               </h1>
-              <p className="font-mono text-xs text-red-500 tracking-widest mt-1">{'>>'} SYS.LOGIN_NODE</p>
+              <p className="font-mono text-xs text-red-500 tracking-widest mt-1">{'>>'} PORTAL LOGIN SISTEM</p>
             </div>
           </Link>
         </div>
@@ -70,28 +70,28 @@ export default function LoginPage() {
           <div className="relative z-10">
             <div className="mb-8 border-b border-zinc-800 pb-4">
               <h2 className="text-lg font-black text-white uppercase tracking-widest flex items-center gap-2">
-                <TerminalSquare size={18} className="text-red-500" /> Authenticate_Node
+                <TerminalSquare size={18} className="text-red-500" /> Otentikasi Pengguna
               </h2>
-              <p className="text-[10px] font-mono text-zinc-500 mt-1 uppercase tracking-widest">Provide credentials to access database</p>
+              <p className="text-[10px] font-mono text-zinc-500 mt-1 uppercase tracking-widest">Masukkan kredensial untuk mengakses database</p>
             </div>
 
             <form onSubmit={handleLogin} className="space-y-5">
               <div>
-                <label className="block text-[10px] font-mono text-zinc-400 uppercase tracking-widest mb-1.5">{'>>'} Comm_Link (Email)</label>
+                <label className="block text-[10px] font-mono text-zinc-400 uppercase tracking-widest mb-1.5">{'>>'} Alamat Email</label>
                 <div className="relative">
                   <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500" />
                   <input type="email" className="w-full bg-zinc-950 border border-zinc-800 focus:border-red-500 focus:shadow-[0_0_10px_rgba(220,38,38,0.2)] text-white font-mono text-sm pl-11 pr-4 py-3 outline-none transition-all placeholder-zinc-700" 
-                    placeholder="user@network.com" value={form.email}
+                    placeholder="user@jaringan.com" value={form.email}
                     onChange={e => setForm(f => ({ ...f, email: e.target.value }))} required />
                 </div>
               </div>
               
               <div>
-                <label className="block text-[10px] font-mono text-zinc-400 uppercase tracking-widest mb-1.5">{'>>'} Passkey</label>
+                <label className="block text-[10px] font-mono text-zinc-400 uppercase tracking-widest mb-1.5">{'>>'} Kata Sandi</label>
                 <div className="relative">
                   <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500" />
                   <input type={showPass ? 'text' : 'password'} className="w-full bg-zinc-950 border border-zinc-800 focus:border-red-500 focus:shadow-[0_0_10px_rgba(220,38,38,0.2)] text-white font-mono text-sm pl-11 pr-12 py-3 outline-none transition-all placeholder-zinc-700" 
-                    placeholder="Enter passkey"
+                    placeholder="Masukkan sandi rahasia"
                     value={form.password} onChange={e => setForm(f => ({ ...f, password: e.target.value }))} required />
                   <button type="button" onClick={() => setShowPass(!showPass)}
                     className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-red-400 transition-colors">
@@ -101,14 +101,14 @@ export default function LoginPage() {
               </div>
               
               <button type="submit" disabled={loading} className="w-full py-4 mt-2 bg-red-600 hover:bg-red-500 text-white font-mono font-bold uppercase tracking-widest border border-red-500 shadow-[0_0_15px_rgba(220,38,38,0.3)] transition-all flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed">
-                {loading ? <span className="spinner border-white/30 border-t-white" /> : <><span>Initialize_Login</span><ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" /></>}
+                {loading ? <span className="spinner border-white/30 border-t-white" /> : <><span>Mulai Sesi Login</span><ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" /></>}
               </button>
             </form>
             
             <div className="mt-6 border-t border-zinc-800 pt-6 text-center">
               <p className="font-mono text-xs text-zinc-500">
-                No active ID?{' '}
-                <Link href="/register" className="text-red-500 font-bold hover:text-red-400 hover:underline uppercase tracking-widest ml-1">Create_Node</Link>
+                Belum memiliki ID?{' '}
+                <Link href="/register" className="text-red-500 font-bold hover:text-red-400 hover:underline uppercase tracking-widest ml-1">Buat Akun</Link>
               </p>
             </div>
           </div>
