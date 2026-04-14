@@ -21,15 +21,15 @@ export default function AdminLoginPage() {
         body: JSON.stringify({ email, password }),
       });
       const data = await res.json();
-      if (!data.success) { toast.error(`Auth_Error: ${data.message}`); return; }
-      toast.success('Credentials Accepted. Awaiting OTP_');
+      if (!data.success) { toast.error(`Kesalahan Otorisasi: ${data.message}`); return; }
+      toast.success('Kredensial Diterima. Menunggu OTP.');
       setStep('otp');
     } finally { setLoading(false); }
   };
 
   const handleOtp = async () => {
     const code = otp.join('');
-    if (code.length !== 6) { toast.error('Require 6-digit decryption key.'); return; }
+    if (code.length !== 6) { toast.error('Dibutuhkan 6 digit kunci dekripsi.'); return; }
     setLoading(true);
     try {
       const res = await fetch('/api/auth/admin-login', {
@@ -37,8 +37,8 @@ export default function AdminLoginPage() {
         body: JSON.stringify({ email, password, otp: code }),
       });
       const data = await res.json();
-      if (!data.success) { toast.error(`Auth_Error: ${data.message}`); return; }
-      toast.success('System Override Complete. Welcome, Admin.');
+      if (!data.success) { toast.error(`Kesalahan Otorisasi: ${data.message}`); return; }
+      toast.success('Akses Diberikan. Selamat datang, Admin.');
       router.push('/admin');
     } finally { setLoading(false); }
   };
@@ -64,10 +64,10 @@ export default function AdminLoginPage() {
             <Crosshair size={60} className="absolute inset-0 text-red-900/30 animate-[spin_10s_linear_infinite]" />
           </div>
           <h1 className="text-2xl font-black text-white uppercase tracking-widest" style={{ textShadow: '2px 2px 0px #dc2626' }}>
-            SYS.ADMIN_PORTAL
+            PORTAL ADMIN SISTEM
           </h1>
           <p className="font-mono text-xs text-red-500 tracking-widest mt-1 uppercase">
-            {'>>'} Restricted_Access_Only
+            {'>>'} KHUSUS AKSES TERBATAS
           </p>
         </div>
 
@@ -85,32 +85,32 @@ export default function AdminLoginPage() {
               <>
                 <div className="mb-6 border-b border-zinc-800 pb-3">
                   <h2 className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2">
-                    <TerminalSquare size={16} className="text-red-500" /> Authenticate_Admin
+                    <TerminalSquare size={16} className="text-red-500" /> Otentikasi Admin
                   </h2>
                 </div>
                 
                 <form onSubmit={handleCreds} className="space-y-5">
                   <div>
-                    <label className="block text-[10px] font-mono text-zinc-400 uppercase tracking-widest mb-1.5">{'>>'} Admin_Comm_Link</label>
+                    <label className="block text-[10px] font-mono text-zinc-400 uppercase tracking-widest mb-1.5">{'>>'} Alamat Email Admin</label>
                     <div className="relative">
                       <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500" />
                       <input type="email" value={email} onChange={e => setEmail(e.target.value)} required
                         className="w-full bg-zinc-950 border border-zinc-800 focus:border-red-500 focus:shadow-[0_0_10px_rgba(220,38,38,0.2)] text-white font-mono text-sm pl-11 pr-4 py-3 outline-none transition-all placeholder-zinc-700"
-                        placeholder="sysadmin@network.com" />
+                        placeholder="sysadmin@jaringan.com" />
                     </div>
                   </div>
                   <div>
-                    <label className="block text-[10px] font-mono text-zinc-400 uppercase tracking-widest mb-1.5">{'>>'} Master_Passkey</label>
+                    <label className="block text-[10px] font-mono text-zinc-400 uppercase tracking-widest mb-1.5">{'>>'} Kata Sandi Utama</label>
                     <div className="relative">
                       <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500" />
                       <input type="password" value={password} onChange={e => setPassword(e.target.value)} required
                         className="w-full bg-zinc-950 border border-zinc-800 focus:border-red-500 focus:shadow-[0_0_10px_rgba(220,38,38,0.2)] text-white font-mono text-sm pl-11 pr-4 py-3 outline-none transition-all placeholder-zinc-700"
-                        placeholder="Enter master key" />
+                        placeholder="Masukkan sandi master" />
                     </div>
                   </div>
                   <button type="submit" disabled={loading}
                     className="w-full py-4 mt-2 bg-red-600 hover:bg-red-500 text-white font-mono font-bold uppercase tracking-widest border border-red-500 shadow-[0_0_15px_rgba(220,38,38,0.3)] transition-all flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed">
-                    {loading ? <span className="spinner border-white/30 border-t-white" /> : <><span>Transmit_Creds</span><ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" /></>}
+                    {loading ? <span className="spinner border-white/30 border-t-white" /> : <><span>Kirim Kredensial</span><ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" /></>}
                   </button>
                 </form>
               </>
@@ -118,10 +118,10 @@ export default function AdminLoginPage() {
               <>
                 <div className="text-center mb-6 border-b border-zinc-800 pb-4">
                   <h2 className="text-sm font-black text-white uppercase tracking-widest flex items-center justify-center gap-2">
-                    <Lock size={16} className="text-red-500" /> Verify_OTP_Key
+                    <Lock size={16} className="text-red-500" /> Verifikasi Kunci OTP
                   </h2>
                   <p className="text-[10px] font-mono text-zinc-400 mt-2 uppercase tracking-widest">
-                    Encrypted key sent to: <br/> <span className="text-red-500 font-bold block mt-1">{email}</span>
+                    Kode enkripsi dikirim ke: <br/> <span className="text-red-500 font-bold block mt-1">{email}</span>
                   </p>
                 </div>
                 
@@ -136,12 +136,12 @@ export default function AdminLoginPage() {
                 
                 <button onClick={handleOtp} disabled={loading}
                   className="w-full py-4 bg-red-600 hover:bg-red-500 text-white font-mono font-bold uppercase tracking-widest border border-red-500 shadow-[0_0_15px_rgba(220,38,38,0.3)] transition-all disabled:opacity-50 disabled:cursor-not-allowed">
-                  {loading ? <span className="spinner border-white/30 border-t-white" /> : 'Authorize_Access'}
+                  {loading ? <span className="spinner border-white/30 border-t-white" /> : 'Otorisasi Akses'}
                 </button>
                 
                 <button onClick={() => { setStep('creds'); setOtp(['', '', '', '', '', '']); }} 
                   className="w-full text-center text-[10px] font-mono uppercase tracking-widest text-zinc-500 mt-4 hover:text-red-400 transition-colors">
-                  {'<'} Abort_Process
+                  {'<'} Batalkan Proses
                 </button>
               </>
             )}
