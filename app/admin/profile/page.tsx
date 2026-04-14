@@ -28,15 +28,15 @@ export default function AdminProfilePage() {
         body: JSON.stringify(body),
       });
       const d = await res.json();
-      if (d.success) { toast.success('Identity Updated Successfully.'); setCurrentPass(''); setNewPass(''); }
-      else toast.error(`Sys_Error: ${d.message}`);
+      if (d.success) { toast.success('Identitas Berhasil Diperbarui.'); setCurrentPass(''); setNewPass(''); }
+      else toast.error(`Kesalahan Sistem: ${d.message}`);
     } finally { setLoading(false); }
   };
 
   if (!profile) return (
     <div className="flex flex-col items-center justify-center pt-32">
       <Crosshair size={40} className="text-red-600 animate-[spin_4s_linear_infinite] mb-4" />
-      <p className="font-mono text-xs text-red-500 uppercase tracking-widest animate-pulse">Initializing_Identity_Module...</p>
+      <p className="font-mono text-xs text-red-500 uppercase tracking-widest animate-pulse">Memuat Modul Identitas...</p>
     </div>
   );
 
@@ -47,11 +47,11 @@ export default function AdminProfilePage() {
         <div className="flex items-center gap-3 mb-1">
           <User className="text-red-500" size={28} />
           <h1 className="text-2xl font-black text-white uppercase tracking-widest" style={{ textShadow: '2px 2px 0px #dc2626' }}>
-            Admin_Profile
+            Profil Admin
           </h1>
         </div>
         <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest pl-10">
-          {'>>'} System Administrator Identity Configuration
+          {'>>'} Konfigurasi Identitas Administrator Sistem
         </p>
       </div>
 
@@ -76,7 +76,7 @@ export default function AdminProfilePage() {
               <div className="mt-3">
                 <span className="inline-flex items-center gap-1.5 text-[10px] font-mono bg-red-950/30 text-red-500 border border-red-900/50 px-2 py-1 uppercase tracking-widest">
                   <div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />
-                  Root_Access_Granted
+                  Akses Root Diberikan
                 </span>
               </div>
             </div>
@@ -86,7 +86,7 @@ export default function AdminProfilePage() {
             {/* Username Input */}
             <div>
               <label className="block text-[10px] font-mono text-zinc-400 uppercase tracking-widest mb-2">
-                {'>>'} Identity_Alias (Username)
+                {'>>'} Alias Identitas (Username)
               </label>
               <input 
                 className="w-full bg-zinc-950 border border-zinc-800 focus:border-red-500 focus:shadow-[0_0_10px_rgba(220,38,38,0.2)] text-white font-mono text-sm px-4 py-3 outline-none transition-all placeholder-zinc-700" 
@@ -99,28 +99,28 @@ export default function AdminProfilePage() {
             <div className="border border-zinc-800 bg-zinc-950 p-5 mt-4">
               <div className="flex items-center gap-2 mb-4 border-b border-zinc-800/50 pb-2">
                 <Lock size={14} className="text-zinc-500" />
-                <p className="text-xs font-black font-mono text-white uppercase tracking-widest">Security_Override (Optional)</p>
+                <p className="text-xs font-black font-mono text-white uppercase tracking-widest">Pembaruan Keamanan (Opsional)</p>
               </div>
               
               <div className="space-y-4">
                 <div>
-                  <label className="block text-[10px] font-mono text-zinc-500 uppercase tracking-widest mb-1.5">Current_Passkey</label>
+                  <label className="block text-[10px] font-mono text-zinc-500 uppercase tracking-widest mb-1.5">Kata Sandi Saat Ini</label>
                   <input 
                     type="password" 
                     className="w-full bg-zinc-900 border border-zinc-800 focus:border-red-500 text-white font-mono text-sm px-4 py-2.5 outline-none transition-all placeholder-zinc-700" 
                     value={currentPass} 
                     onChange={e => setCurrentPass(e.target.value)} 
-                    placeholder="Enter current master key" 
+                    placeholder="Masukkan sandi master saat ini" 
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-mono text-zinc-500 uppercase tracking-widest mb-1.5">New_Passkey</label>
+                  <label className="block text-[10px] font-mono text-zinc-500 uppercase tracking-widest mb-1.5">Kata Sandi Baru</label>
                   <input 
                     type="password" 
                     className="w-full bg-zinc-900 border border-zinc-800 focus:border-red-500 text-white font-mono text-sm px-4 py-2.5 outline-none transition-all placeholder-zinc-700" 
                     value={newPass} 
                     onChange={e => setNewPass(e.target.value)} 
-                    placeholder="Min. 6 characters" 
+                    placeholder="Min. 6 karakter" 
                   />
                 </div>
               </div>
@@ -131,7 +131,7 @@ export default function AdminProfilePage() {
               onClick={handleSave} 
               disabled={loading} 
               className="w-full py-4 mt-4 bg-red-600 hover:bg-red-500 text-white font-mono font-bold uppercase tracking-widest border border-red-500 shadow-[0_0_15px_rgba(220,38,38,0.3)] transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
-              {loading ? <span className="spinner border-white/30 border-t-white" /> : <><Save size={16} /> Execute_Identity_Update</>}
+              {loading ? <span className="spinner border-white/30 border-t-white" /> : <><Save size={16} /> Simpan Pembaruan Identitas</>}
             </button>
           </div>
         </div>
