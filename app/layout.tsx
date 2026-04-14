@@ -5,7 +5,7 @@ import { Toaster } from 'react-hot-toast';
 export const metadata: Metadata = {
   title: 'Kirei Chisa - Premium Digital Services',
   description: 'Beli akun premium dan OTP nomor virtual dengan mudah, cepat, dan terpercaya.',
-  icons: { icon: '/favicon.ico' },
+  icons: { icon: '/IMG-20260412-WA0012.jpg' },
   openGraph: {
     title: 'Kirei Chisa',
     description: 'Premium Digital Services - Premku & Nokos',
