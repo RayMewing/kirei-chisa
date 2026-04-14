@@ -15,7 +15,12 @@ const fmtDate = (d: string) => new Date(d).toLocaleString('id-ID', { day: '2-dig
 
 const StatusBadge = ({ s }: { s: string }) => {
   const map: Record<string, string> = { success: 'badge-success', completed: 'badge-success', confirmed: 'badge-success', pending: 'badge-pending', processing: 'badge-pending', active: 'badge-active', failed: 'badge-failed', canceled: 'badge-failed', cancel: 'badge-failed', expired: 'badge-failed' };
-  return <span className={map[s] || 'badge-pending'}>{s.toUpperCase()}</span>;
+  const labelMap: Record<string, string> = {
+    success: 'SUKSES', completed: 'SUKSES', confirmed: 'SUKSES',
+    pending: 'PENDING', processing: 'DIPROSES', active: 'AKTIF',
+    failed: 'GAGAL', canceled: 'BATAL', cancel: 'BATAL', expired: 'KEDALUWARSA',
+  };
+  return <span className={map[s] || 'badge-pending'}>{labelMap[s] || s.toUpperCase()}</span>;
 };
 
 export default function AdminTransactionsPage() {
@@ -31,7 +36,7 @@ export default function AdminTransactionsPage() {
   }, []);
 
   const confirmDeposit = async (id: string) => {
-    if (!confirm('Authorize this deposit and inject funds to user node?')) return;
+    if (!confirm('Otorisasi deposit ini dan masukkan dana ke node pengguna?')) return;
     setConfirming(id);
     try {
       const res = await fetch('/api/admin/transactions', {
@@ -40,18 +45,18 @@ export default function AdminTransactionsPage() {
       });
       const d = await res.json();
       if (d.success) { 
-        toast.success('Funds Injected Successfully.'); 
+        toast.success('Dana Berhasil Dimasukkan.'); 
         setData(prev => ({ ...prev, premkuDeposits: prev.premkuDeposits.map(dep => dep._id === id ? { ...dep, status: 'confirmed', confirmedByAdmin: true } : dep) })); 
       }
-      else toast.error(`Sys_Error: ${d.message}`);
+      else toast.error(`Kesalahan Sistem: ${d.message}`);
     } finally { setConfirming(null); }
   };
 
   const tabs = [
-    { id: 'premku-deposits' as Tab, label: 'Premku_Deposits' },
-    { id: 'nokos-deposits' as Tab, label: 'Nokos_Deposits' },
-    { id: 'premku-orders' as Tab, label: 'Premku_Orders' },
-    { id: 'nokos-orders' as Tab, label: 'Nokos_Orders' },
+    { id: 'premku-deposits' as Tab, label: 'Deposit Premku' },
+    { id: 'nokos-deposits' as Tab, label: 'Deposit Nokos' },
+    { id: 'premku-orders' as Tab, label: 'Pesanan Premku' },
+    { id: 'nokos-orders' as Tab, label: 'Pesanan Nokos' },
   ];
 
   return (
@@ -61,9 +66,9 @@ export default function AdminTransactionsPage() {
         <Receipt className="text-red-500" size={28} />
         <div>
           <h1 className="text-2xl font-black text-white uppercase tracking-widest" style={{ textShadow: '2px 2px 0px #dc2626' }}>
-            Sys_Transactions
+            Transaksi Sistem
           </h1>
-          <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest mt-1">{'>>'} Financial & Operational Logs</p>
+          <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest mt-1">{'>>'} Catatan Finansial & Operasional</p>
         </div>
       </div>
 
@@ -97,12 +102,12 @@ export default function AdminTransactionsPage() {
               <table className="w-full text-left">
                 <thead className="bg-zinc-950 border-b border-zinc-800">
                   <tr>
-                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">User_Node</th>
-                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Invoice_ID</th>
-                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Amount</th>
-                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Sys_Status</th>
-                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Timestamp</th>
-                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Action</th>
+                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Node Pengguna</th>
+                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">ID Invoice</th>
+                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Jumlah</th>
+                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Status Sistem</th>
+                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Waktu</th>
+                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Aksi</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-800/50">
@@ -117,14 +122,14 @@ export default function AdminTransactionsPage() {
                         {dep.status === 'pending' && !dep.confirmedByAdmin && (
                           <button onClick={() => confirmDeposit(dep._id)} disabled={confirming === dep._id}
                             className="flex items-center gap-2 text-[10px] font-mono font-bold uppercase tracking-widest bg-emerald-950/30 hover:bg-emerald-900/50 border border-emerald-900/50 text-emerald-500 px-3 py-2 transition-colors">
-                            {confirming === dep._id ? <span className="spinner border-emerald-500/30 border-t-emerald-500 scale-75" /> : <><CheckCircle size={12} /> Authorize</>}
+                            {confirming === dep._id ? <span className="spinner border-emerald-500/30 border-t-emerald-500 scale-75" /> : <><CheckCircle size={12} /> Otorisasi</>}
                           </button>
                         )}
                       </td>
                     </tr>
                   ))}
                   {data.premkuDeposits.length === 0 && (
-                    <tr><td colSpan={6} className="px-5 py-10 text-center text-xs font-mono text-zinc-600 uppercase tracking-widest">{'>>'} No_Data_Found</td></tr>
+                    <tr><td colSpan={6} className="px-5 py-10 text-center text-xs font-mono text-zinc-600 uppercase tracking-widest">{'>>'} TIDAK ADA DATA</td></tr>
                   )}
                 </tbody>
               </table>
@@ -135,11 +140,11 @@ export default function AdminTransactionsPage() {
               <table className="w-full text-left">
                 <thead className="bg-zinc-950 border-b border-zinc-800">
                   <tr>
-                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">User_Node</th>
-                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Deposit_ID</th>
-                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Received</th>
-                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Sys_Status</th>
-                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Timestamp</th>
+                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Node Pengguna</th>
+                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">ID Deposit</th>
+                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Diterima</th>
+                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Status Sistem</th>
+                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Waktu</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-800/50">
@@ -153,7 +158,7 @@ export default function AdminTransactionsPage() {
                     </tr>
                   ))}
                   {data.nokosDeposits.length === 0 && (
-                    <tr><td colSpan={5} className="px-5 py-10 text-center text-xs font-mono text-zinc-600 uppercase tracking-widest">{'>>'} No_Data_Found</td></tr>
+                    <tr><td colSpan={5} className="px-5 py-10 text-center text-xs font-mono text-zinc-600 uppercase tracking-widest">{'>>'} TIDAK ADA DATA</td></tr>
                   )}
                 </tbody>
               </table>
@@ -164,11 +169,11 @@ export default function AdminTransactionsPage() {
               <table className="w-full text-left">
                 <thead className="bg-zinc-950 border-b border-zinc-800">
                   <tr>
-                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">User_Node</th>
-                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Module</th>
-                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Total_Cost</th>
-                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Sys_Status</th>
-                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Timestamp</th>
+                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Node Pengguna</th>
+                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Modul</th>
+                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Total Biaya</th>
+                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Status Sistem</th>
+                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Waktu</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-800/50">
@@ -182,7 +187,7 @@ export default function AdminTransactionsPage() {
                     </tr>
                   ))}
                   {data.premkuOrders.length === 0 && (
-                    <tr><td colSpan={5} className="px-5 py-10 text-center text-xs font-mono text-zinc-600 uppercase tracking-widest">{'>>'} No_Data_Found</td></tr>
+                    <tr><td colSpan={5} className="px-5 py-10 text-center text-xs font-mono text-zinc-600 uppercase tracking-widest">{'>>'} TIDAK ADA DATA</td></tr>
                   )}
                 </tbody>
               </table>
@@ -193,13 +198,13 @@ export default function AdminTransactionsPage() {
               <table className="w-full text-left">
                 <thead className="bg-zinc-950 border-b border-zinc-800">
                   <tr>
-                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">User_Node</th>
-                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Service // Region</th>
-                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Virtual_No</th>
-                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Decrypted_Key</th>
-                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Cost</th>
-                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Sys_Status</th>
-                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Timestamp</th>
+                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Node Pengguna</th>
+                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Layanan // Wilayah</th>
+                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">No Virtual</th>
+                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Kunci Dekripsi</th>
+                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Biaya</th>
+                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Status Sistem</th>
+                    <th className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest px-5 py-4">Waktu</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-800/50">
@@ -215,7 +220,7 @@ export default function AdminTransactionsPage() {
                     </tr>
                   ))}
                   {data.nokosOrders.length === 0 && (
-                    <tr><td colSpan={7} className="px-5 py-10 text-center text-xs font-mono text-zinc-600 uppercase tracking-widest">{'>>'} No_Data_Found</td></tr>
+                    <tr><td colSpan={7} className="px-5 py-10 text-center text-xs font-mono text-zinc-600 uppercase tracking-widest">{'>>'} TIDAK ADA DATA</td></tr>
                   )}
                 </tbody>
               </table>
