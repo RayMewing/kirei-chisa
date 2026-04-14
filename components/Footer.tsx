@@ -79,7 +79,7 @@ export default function Footer() {
                   <div className="absolute -bottom-1.5 -left-1.5 w-3 h-3 bg-red-500"></div>
                   {/* Pake img biasa biar aman dari strict config next/image URL external */}
                   <img 
-                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT0lzCH2sjfPf9OcCHGa-oHC1VoJF9D07WarLXj_Pen3g&s" 
+                    src="https://whqlpszmydukjwyyexnf.supabase.co/storage/v1/object/public/media-hosting/ray-1776143746380.jpg" 
                     alt="Admin Kirei Chisa" 
                     className="w-full h-full object-cover grayscale-[70%] group-hover:grayscale-0 transition-all duration-300"
                   />
