@@ -86,10 +86,10 @@ export default function Footer() {
                 </div>
                 <div>
                   <span className="font-black text-white text-xl uppercase tracking-widest block" style={{ textShadow: '2px 2px 0px #dc2626' }}>
-                    Kirei_Chisa
+                    Kirei Chisa
                   </span>
                   <span className="font-bold font-mono text-red-500 text-[10px] tracking-[0.2em] uppercase">
-                    System_Administrator
+                    System Administrator
                   </span>
                 </div>
               </div>
@@ -106,10 +106,10 @@ export default function Footer() {
               </h4>
               <ul className="space-y-3 font-mono text-xs">
                 {[
-                  { href: '/premku', label: 'Premku_DB (Premium)' },
-                  { href: '/nokos', label: 'Nokos_OTP (Virtual)' },
-                  { href: '/deposit', label: 'Inject_Funds (Top-Up)' },
-                  { href: '/history', label: 'System_Log (History)' },
+                  { href: '/premku', label: 'Premku (Premium)' },
+                  { href: '/nokos', label: 'Nokos OTP (Virtual)' },
+                  { href: '/deposit', label: 'Deposit (Top-Up)' },
+                  { href: '/history', label: 'History (History)' },
                 ].map(l => (
                   <li key={l.href}>
                     <Link href={l.href} className="text-zinc-500 hover:text-red-400 flex items-center gap-2 transition-colors group">
@@ -123,7 +123,7 @@ export default function Footer() {
             {/* Social / Comm Links */}
             <div>
               <h4 className="font-black text-white mb-4 text-sm uppercase tracking-widest flex items-center gap-2">
-                <Radio size={16} className="text-red-500" /> Comm_Channels
+                <Radio size={16} className="text-red-500" /> Channels
               </h4>
               <div className="flex flex-col gap-2">
                 {[
@@ -145,7 +145,7 @@ export default function Footer() {
 
           <div className="border-t border-zinc-800 mt-10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-[10px] font-mono text-zinc-600 uppercase tracking-widest">
-              © 2026 KIREI_CHISA // ALL_RIGHTS_RESERVED
+              © 2026 KIREI_CHISA ALL RIGHTS RESERVED
             </p>
             <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest flex items-center gap-2">
               Constructed with <Zap size={12} className="text-red-500" /> for optimal execution
