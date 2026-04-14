@@ -10,7 +10,7 @@ export async function GET() {
   try {
     await connectDB();
 
-    // 1. Ambil Custom Products dari Database lokal
+    
     const customProds = await CustomProduct.find({ isActive: true }).lean() as any[];
     const mappedCustom = customProds.map(p => {
       const stock = p.accounts ? p.accounts.filter((a: any) => !a.sold).length : 0;
@@ -21,17 +21,17 @@ export async function GET() {
         price: p.price,
         status: stock > 0 ? 'available' : 'unavailable',
         stock: stock,
-        image: p.imageBase64 || '', // Gambar dari DB Custom
-        category: p.category || extractCategory(p.name), // Kategori dari DB Admin
-        isCustom: true // Penanda penting buat frontend
+        image: p.imageBase64 || '', 
+        category: p.category || extractCategory(p.name), 
+        isCustom: true
       };
     });
 
-    // 2. Ambil harga settingan admin untuk Premku API
+
     const pricingSetting = await Settings.findOne({ key: 'premku_pricing' }).lean() as any;
     const customPrices = pricingSetting?.value || {};
 
-    // 3. Ambil produk dari API Premku Pusat
+    
     const res = await fetch('https://premku.com/api/products', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -40,23 +40,25 @@ export async function GET() {
     });
     const data = await res.json();
     
-    let premkuProds = [];
+        let premkuProds = [];
     if (data.success) {
       premkuProds = data.products.map((p: any) => ({
         id: p.id,
         name: p.name,
         description: p.description || '',
-        // Pakai harga admin kalau diset, kalau gak pakai harga asli
+        
         price: customPrices[String(p.id)] ? Number(customPrices[String(p.id)]) : Number(p.price), 
         status: p.status,
-        stock: p.status === 'available' ? 999 : 0,
-        image: p.image || '', // FIX: Panggil gambar asli dari API Premku
-        category: extractCategory(p.name), // FIX: Otomatis bikin kategori dari nama
+        
+        stock: p.stock !== undefined ? Number(p.stock) : (p.status === 'available' ? 999 : 0),
+        image: p.image || '', 
+        category: extractCategory(p.name), 
         isCustom: false
       }));
     }
 
-    // 4. Gabungin Keduanya
+
+    
     const allProducts = [...mappedCustom, ...premkuProds];
 
     return NextResponse.json({ success: true, products: allProducts });
