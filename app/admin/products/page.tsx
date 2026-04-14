@@ -50,7 +50,7 @@ export default function AdminProductsPage() {
   }, [tab]);
 
   const handleAddProduct = async () => {
-    if (!newProd.name || !newProd.price) { toast.error('Name and Cost required.'); return; }
+    if (!newProd.name || !newProd.price) { toast.error('Nama dan Harga wajib diisi.'); return; }
     setAddingProd(true);
     const res = await fetch('/api/admin/custom-products', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -58,7 +58,7 @@ export default function AdminProductsPage() {
     });
     const d = await res.json();
     if (d.success) {
-      toast.success('Module successfully deployed!');
+      toast.success('Modul berhasil diluncurkan!');
       setProducts(p => [d.product, ...p]);
       setNewProd({ name: '', description: '', imageBase64: '', price: '', category: '' });
       setShowAddForm(false);
@@ -67,13 +67,13 @@ export default function AdminProductsPage() {
   };
 
   const handleDeleteProduct = async (id: string) => {
-    if (!confirm('Purge this module from database?')) return;
+    if (!confirm('Hapus modul ini dari database?')) return;
     const res = await fetch('/api/admin/custom-products', {
       method: 'DELETE', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id }),
     });
     const d = await res.json();
-    if (d.success) { toast.success('Module purged.'); setProducts(p => p.filter(x => x._id !== id)); }
+    if (d.success) { toast.success('Modul dihapus.'); setProducts(p => p.filter(x => x._id !== id)); }
     else toast.error(d.message);
   };
 
@@ -88,7 +88,7 @@ export default function AdminProductsPage() {
 
   const handleAddAccount = async (productId: string) => {
     const acc = newAccount[productId];
-    if (!acc?.email || !acc?.password) { toast.error('ID and Passkey required.'); return; }
+    if (!acc?.email || !acc?.password) { toast.error('ID dan Sandi wajib diisi.'); return; }
     setAddingAcc(productId);
     const res = await fetch('/api/admin/custom-products', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -96,7 +96,7 @@ export default function AdminProductsPage() {
     });
     const d = await res.json();
     if (d.success) {
-      toast.success('Node added to inventory!');
+      toast.success('Data dimasukkan ke inventaris!');
       setProducts(p => p.map(x => x._id === productId ? d.product : x));
       setNewAccount(n => ({ ...n, [productId]: { email: '', password: '', notes: '' } }));
     } else toast.error(d.message);
@@ -104,14 +104,14 @@ export default function AdminProductsPage() {
   };
 
   const handleDeleteAccount = async (productId: string, idx: number) => {
-    if (!confirm('Remove this node from inventory?')) return;
+    if (!confirm('Hapus data ini dari inventaris?')) return;
     const res = await fetch('/api/admin/custom-products', {
       method: 'DELETE', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ productId, accountIndex: idx }),
     });
     const d = await res.json();
     if (d.success) {
-      toast.success('Node removed.');
+      toast.success('Data dihapus.');
       setProducts(p => p.map(x => {
         if (x._id !== productId) return x;
         return { ...x, accounts: x.accounts.filter((_, i) => i !== idx) };
@@ -122,7 +122,7 @@ export default function AdminProductsPage() {
   const savePremkuPrice = async (productId: number) => {
     const priceStr = editingPrices[String(productId)];
     const price = parseInt(priceStr);
-    if (!priceStr || isNaN(price)) { toast.error('Invalid parameter.'); return; }
+    if (!priceStr || isNaN(price)) { toast.error('Parameter tidak valid.'); return; }
     setSavingPrice(productId);
     const newPricing = { ...premkuPricing, [String(productId)]: price };
     const res = await fetch('/api/admin/settings', {
@@ -131,7 +131,7 @@ export default function AdminProductsPage() {
     });
     const d = await res.json();
     if (d.success) {
-      toast.success('Pricing parameter updated!');
+      toast.success('Parameter harga diperbarui!');
       setPremkuPricing(newPricing);
       setEditingPrices(e => { const n = { ...e }; delete n[String(productId)]; return n; });
     } else toast.error(d.message);
@@ -145,15 +145,15 @@ export default function AdminProductsPage() {
         <Package className="text-red-500" size={28} />
         <div>
           <h1 className="text-2xl font-black text-white uppercase tracking-widest" style={{ textShadow: '2px 2px 0px #dc2626' }}>
-            Module_Manager
+            Manajer Modul
           </h1>
-          <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest mt-1">{'>>'} Database Inventory Control</p>
+          <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest mt-1">{'>>'} Kendali Inventaris Database</p>
         </div>
       </div>
 
       {/* Tabs */}
       <div className="flex gap-2 border-l-2 border-red-600 pl-3 bg-zinc-950/50 p-2 overflow-x-auto custom-scrollbar">
-        {[['custom', 'Custom_Nodes'], ['premku', 'Premku_Pricing']].map(([id, label]) => (
+        {[['custom', 'Produk Kustom'], ['premku', 'Harga Premku API']].map(([id, label]) => (
           <button key={id} onClick={() => setTab(id as 'custom' | 'premku')}
             className={`px-4 py-2 text-xs font-mono font-bold uppercase tracking-widest transition-all whitespace-nowrap border ${
               tab === id 
@@ -169,7 +169,7 @@ export default function AdminProductsPage() {
       {tab === 'custom' && (
         <div className="space-y-6">
           <button onClick={() => setShowAddForm(!showAddForm)} className="btn-primary py-3 text-xs w-full sm:w-auto">
-            {showAddForm ? <><X size={14} /> Cancel_Deploy</> : <><Plus size={14} /> Deploy_New_Module</>}
+            {showAddForm ? <><X size={14} /> Batalkan Peluncuran</> : <><Plus size={14} /> Luncurkan Modul Baru</>}
           </button>
 
           {/* Add Product Form */}
@@ -180,38 +180,38 @@ export default function AdminProductsPage() {
               <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-red-500"></div>
               
               <h2 className="font-black font-mono text-white uppercase tracking-widest mb-4 border-b border-zinc-800 pb-2 flex items-center gap-2">
-                <TerminalSquare size={16} className="text-red-500" /> Construct_Module
+                <TerminalSquare size={16} className="text-red-500" /> Konstruksi Modul
               </h2>
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-6">
                 <div className="sm:col-span-2 bg-zinc-950 border border-zinc-800 p-4">
-                  <p className="text-[10px] font-mono text-zinc-400 uppercase tracking-widest mb-2">{'>>'} Visual_Asset</p>
+                  <p className="text-[10px] font-mono text-zinc-400 uppercase tracking-widest mb-2">{'>>'} Aset Visual</p>
                   <ImageUpload value={newProd.imageBase64} onChange={v => setNewProd(p => ({ ...p, imageBase64: v }))}
                     label="" aspectRatio="16/9" maxSizeMB={2} />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-mono text-zinc-400 uppercase tracking-widest mb-1.5">{'>>'} Module_ID (Name)</label>
-                  <input className="input" placeholder="e.g. Netflix Premium" value={newProd.name}
+                  <label className="block text-[10px] font-mono text-zinc-400 uppercase tracking-widest mb-1.5">{'>>'} ID Modul (Nama)</label>
+                  <input className="input" placeholder="contoh: Akun Premium" value={newProd.name}
                     onChange={e => setNewProd(p => ({ ...p, name: e.target.value }))} />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-mono text-zinc-400 uppercase tracking-widest mb-1.5">{'>>'} Base_Cost (Rp)</label>
-                  <input type="number" className="input" placeholder="e.g. 35000" value={newProd.price}
+                  <label className="block text-[10px] font-mono text-zinc-400 uppercase tracking-widest mb-1.5">{'>>'} Biaya Dasar (Rp)</label>
+                  <input type="number" className="input" placeholder="contoh: 35000" value={newProd.price}
                     onChange={e => setNewProd(p => ({ ...p, price: e.target.value }))} />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-mono text-zinc-400 uppercase tracking-widest mb-1.5">{'>>'} Category_Tag</label>
-                  <input className="input" placeholder="e.g. Entertainment" value={newProd.category}
+                  <label className="block text-[10px] font-mono text-zinc-400 uppercase tracking-widest mb-1.5">{'>>'} Label Kategori</label>
+                  <input className="input" placeholder="contoh: Hiburan" value={newProd.category}
                     onChange={e => setNewProd(p => ({ ...p, category: e.target.value }))} />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-mono text-zinc-400 uppercase tracking-widest mb-1.5">{'>>'} Parameters (Desc)</label>
-                  <input className="input" placeholder="e.g. 30 Days Warranty" value={newProd.description}
+                  <label className="block text-[10px] font-mono text-zinc-400 uppercase tracking-widest mb-1.5">{'>>'} Parameter (Deskripsi)</label>
+                  <input className="input" placeholder="contoh: Garansi 30 Hari" value={newProd.description}
                     onChange={e => setNewProd(p => ({ ...p, description: e.target.value }))} />
                 </div>
               </div>
               <button onClick={handleAddProduct} disabled={addingProd} className="w-full py-4 bg-red-600 hover:bg-red-500 text-white font-mono font-bold uppercase tracking-widest border border-red-500 transition-all flex items-center justify-center gap-2">
-                {addingProd ? <span className="spinner border-white/30 border-t-white" /> : <><Save size={14} /> Execute_Save</>}
+                {addingProd ? <span className="spinner border-white/30 border-t-white" /> : <><Save size={14} /> Simpan Modul</>}
               </button>
             </div>
           )}
@@ -223,7 +223,7 @@ export default function AdminProductsPage() {
             <div className="border border-dashed border-zinc-800 bg-zinc-900/30 text-center py-12 relative">
               <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0)_50%,rgba(0,0,0,0.1)_50%)] bg-[length:100%_4px] pointer-events-none opacity-50" />
               <Server size={40} className="mx-auto mb-4 text-zinc-700 animate-pulse" />
-              <p className="font-mono text-zinc-500 uppercase tracking-widest text-sm">{'>>'} INVENTORY_EMPTY</p>
+              <p className="font-mono text-zinc-500 uppercase tracking-widest text-sm">{'>>'} INVENTARIS KOSONG</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -256,11 +256,11 @@ export default function AdminProductsPage() {
                             <div className="flex items-center gap-2 mt-3 flex-wrap">
                               <span className="font-black font-mono text-red-500 text-sm drop-shadow-[0_0_5px_rgba(220,38,38,0.5)]">{formatRupiah(product.price)}</span>
                               <span className="text-[10px] font-mono bg-emerald-950/30 text-emerald-500 border border-emerald-900/50 px-2 py-0.5 uppercase tracking-widest">
-                                {availableStock} Active
+                                Tersedia: {availableStock}
                               </span>
                               {soldStock > 0 && (
                                 <span className="text-[10px] font-mono bg-zinc-800 text-zinc-400 px-2 py-0.5 uppercase tracking-widest">
-                                  {soldStock} Consumed
+                                  Terjual: {soldStock}
                                 </span>
                               )}
                               <span className="text-[10px] font-mono bg-red-950/30 text-red-400 border border-red-900/50 px-2 py-0.5 uppercase tracking-widest">{product.category}</span>
@@ -292,19 +292,19 @@ export default function AdminProductsPage() {
                         {/* Add Account Form */}
                         <div className="bg-zinc-900 border border-zinc-800 p-4">
                           <p className="text-[10px] font-mono font-bold text-white uppercase tracking-widest mb-3 flex items-center gap-2">
-                            <Plus size={12} className="text-red-500" /> Inject_Node_Data
+                            <Plus size={12} className="text-red-500" /> Masukkan Data Kredensial Baru
                           </p>
                           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                             <input className="input" placeholder="ID / Email" value={acc.email}
                               onChange={e => setNewAccount(n => ({ ...n, [product._id]: { ...acc, email: e.target.value } }))} />
-                            <input className="input" placeholder="Passkey" value={acc.password}
+                            <input className="input" placeholder="Kata Sandi" value={acc.password}
                               onChange={e => setNewAccount(n => ({ ...n, [product._id]: { ...acc, password: e.target.value } }))} />
-                            <input className="input" placeholder="Parameters (Opt)" value={acc.notes}
+                            <input className="input" placeholder="Catatan Tambahan (Opsional)" value={acc.notes}
                               onChange={e => setNewAccount(n => ({ ...n, [product._id]: { ...acc, notes: e.target.value } }))} />
                           </div>
                           <button onClick={() => handleAddAccount(product._id)} disabled={addingAcc === product._id}
                             className="btn-secondary w-full sm:w-auto mt-3 text-xs py-2 px-6">
-                            {addingAcc === product._id ? <span className="spinner border-red-500/30 border-t-red-500" /> : 'Execute_Injection'}
+                            {addingAcc === product._id ? <span className="spinner border-red-500/30 border-t-red-500" /> : 'Eksekusi Injeksi'}
                           </button>
                         </div>
 
@@ -312,7 +312,7 @@ export default function AdminProductsPage() {
                         {product.accounts.length > 0 && (
                           <div>
                             <p className="text-[10px] font-mono font-bold text-white uppercase tracking-widest mb-3 flex items-center gap-2">
-                              <Server size={12} className="text-red-500" /> Active_Inventory [{product.accounts.length}]
+                              <Server size={12} className="text-red-500" /> Data Inventaris Aktif [{product.accounts.length}]
                             </p>
                             <div className="space-y-2">
                               {product.accounts.map((a, idx) => (
@@ -328,7 +328,7 @@ export default function AdminProductsPage() {
                                   
                                   <div className="flex items-center justify-between sm:justify-end gap-3 mt-2 sm:mt-0">
                                     <span className={`px-2 py-1 text-[10px] uppercase tracking-widest ${a.sold ? 'bg-zinc-800 text-zinc-500' : 'bg-emerald-950/30 text-emerald-500 border border-emerald-900/50'}`}>
-                                      {a.sold ? 'Consumed' : 'Ready'}
+                                      {a.sold ? 'Dikonsumsi' : 'Siap'}
                                     </span>
                                     {!a.sold && (
                                       <button onClick={() => handleDeleteAccount(product._id, idx)}
@@ -357,7 +357,7 @@ export default function AdminProductsPage() {
         <div className="space-y-6">
           <div className="bg-amber-950/20 border border-amber-500/50 p-4 text-[10px] font-mono text-amber-500 uppercase tracking-widest flex items-start gap-3 shadow-[0_0_15px_rgba(245,158,11,0.1)]">
             <Tag size={16} className="flex-shrink-0 animate-pulse" />
-            <p>Configure retail parameters for Premku API modules. Leave blank to inherit native API pricing. Users will be billed based on designated retail parameters.</p>
+            <p>Konfigurasi parameter harga eceran untuk modul API Premku. Biarkan kosong untuk mewarisi harga asli API. Pengguna akan ditagih berdasarkan parameter eceran yang ditentukan.</p>
           </div>
 
           {loadingPremku ? (
@@ -368,9 +368,9 @@ export default function AdminProductsPage() {
               <table className="w-full relative z-10">
                 <thead>
                   <tr className="border-b border-zinc-800 bg-zinc-950">
-                    <th className="text-left text-[10px] font-mono text-zinc-500 uppercase tracking-widest px-5 py-4">Module_ID</th>
-                    <th className="text-left text-[10px] font-mono text-zinc-500 uppercase tracking-widest px-5 py-4">Native_Cost</th>
-                    <th className="text-left text-[10px] font-mono text-zinc-500 uppercase tracking-widest px-5 py-4">Retail_Parameter</th>
+                    <th className="text-left text-[10px] font-mono text-zinc-500 uppercase tracking-widest px-5 py-4">ID Modul</th>
+                    <th className="text-left text-[10px] font-mono text-zinc-500 uppercase tracking-widest px-5 py-4">Harga Asli Pusat</th>
+                    <th className="text-left text-[10px] font-mono text-zinc-500 uppercase tracking-widest px-5 py-4">Parameter Harga Jual</th>
                     <th className="px-5 py-4" />
                   </tr>
                 </thead>
@@ -393,7 +393,7 @@ export default function AdminProductsPage() {
                               onChange={e => setEditingPrices(ep => ({ ...ep, [String(p.id)]: e.target.value }))} />
                           ) : (
                             <span className={`text-xs font-mono font-black ${customPrice ? 'text-red-500 drop-shadow-[0_0_5px_rgba(220,38,38,0.5)]' : 'text-zinc-600'}`}>
-                              {customPrice ? formatRupiah(customPrice) : '[INHERIT_NATIVE]'}
+                              {customPrice ? formatRupiah(customPrice) : '[MENGIKUTI PUSAT]'}
                             </span>
                           )}
                         </td>
