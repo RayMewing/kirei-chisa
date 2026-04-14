@@ -32,16 +32,16 @@ export default function Navbar() {
   };
 
   const navLinks = [
-    { href: '/', label: 'Sys_Home', icon: Home },
-    { href: '/premku', label: 'Premku_DB', icon: ShoppingBag },
-    { href: '/nokos', label: 'Nokos_OTP', icon: Phone },
-    { href: '/ppob', label: 'PPOB_Node', icon: Zap },
+    { href: '/', label: 'Home', icon: Home },
+    { href: '/premku', label: 'Premku', icon: ShoppingBag },
+    { href: '/nokos', label: 'Nokos OTP', icon: Phone },
+    { href: '/ppob', label: 'PPOB', icon: Zap },
   ];
 
   const userLinks = [
     { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { href: '/history', label: 'Sys_Log', icon: History },
-    { href: '/deposit', label: 'Inject_Funds', icon: CreditCard },
+    { href: '/history', label: 'History', icon: History },
+    { href: '/deposit', label: 'Deposit', icon: CreditCard },
   ];
 
   const isActive = (href: string) => href === '/' ? pathname === '/' : pathname.startsWith(href);
@@ -58,8 +58,8 @@ export default function Navbar() {
               <div className="absolute inset-0 bg-red-500 blur-md opacity-20 group-hover:opacity-50 transition-opacity" />
             </div>
             <div className="hidden sm:block leading-none">
-              <span className="font-black text-white text-xl uppercase tracking-widest block" style={{ textShadow: '2px 2px 0px #dc2626' }}>Kirei_Chisa</span>
-              <span className="text-[9px] font-mono text-red-500 tracking-[0.2em] uppercase">Sys.Online // Active</span>
+              <span className="font-black text-white text-xl uppercase tracking-widest block" style={{ textShadow: '2px 2px 0px #dc2626' }}>Kirei Chisa</span>
+              <span className="text-[9px] font-mono text-red-500 tracking-[0.2em] uppercase">Online // Active</span>
             </div>
           </Link>
 
@@ -111,7 +111,7 @@ export default function Navbar() {
                         <p className="text-lg font-black text-white font-mono">Rp{user.nokosBalance.toLocaleString('id-ID')}</p>
                       </div>
                       <button onClick={handleLogout} className="w-full flex items-center justify-center gap-2 px-4 py-3 text-xs font-mono font-bold text-red-500 hover:bg-red-950/50 hover:text-red-400 transition-colors uppercase tracking-widest relative z-10">
-                        <LogOut size={14} /> Disconnect_Session
+                        <LogOut size={14} /> Disconnect Session
                       </button>
                     </div>
                   )}
@@ -168,7 +168,7 @@ export default function Navbar() {
                 </div>
 
                 <button onClick={() => { handleLogout(); setMenuOpen(false); }} className="w-full flex items-center justify-center gap-2 px-4 py-4 text-xs font-mono font-bold text-red-500 bg-red-950/20 hover:bg-red-900/40 border border-red-900/50 transition-colors uppercase tracking-widest">
-                  <LogOut size={16} /> Disconnect_Session
+                  <LogOut size={16} /> Disconnect Session
                 </button>
               </div>
             ) : (
