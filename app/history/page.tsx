@@ -101,10 +101,10 @@ export default function HistoryPage() {
   };
 
   const tabs: { id: Tab; label: string; icon: React.ElementType }[] = [
-    { id: 'premku-orders', label: 'Premku_Orders', icon: ShoppingBag },
-    { id: 'nokos-orders', label: 'Nokos_Orders', icon: Phone },
-    { id: 'premku-deposits', label: 'Premku_Funds', icon: CreditCard },
-    { id: 'nokos-deposits', label: 'Nokos_Funds', icon: CreditCard },
+    { id: 'premku-orders', label: 'Premku Orders', icon: ShoppingBag },
+    { id: 'nokos-orders', label: 'Nokos Orders', icon: Phone },
+    { id: 'premku-deposits', label: 'Premku Funds', icon: CreditCard },
+    { id: 'nokos-deposits', label: 'Nokos Funds', icon: CreditCard },
   ];
 
   return (
@@ -123,7 +123,7 @@ export default function HistoryPage() {
               Sys_History
             </h1>
           </div>
-          <p className="text-zinc-500 font-mono text-xs pl-10">{'>>'} Transaction logs & execution records_</p>
+          <p className="text-zinc-500 font-mono text-xs pl-10">{'>>'} Transaction logs </p>
         </div>
 
         {/* Terminal Tabs */}
@@ -156,7 +156,7 @@ export default function HistoryPage() {
             {tab === 'premku-orders' && (
               data.premkuOrders.length === 0 ? (
                 <div className="border border-dashed border-zinc-800 bg-zinc-900/30 text-center py-12 font-mono text-zinc-500 uppercase text-xs tracking-widest">
-                  {'>>'} NO_RECORDS_FOUND
+                  {'>>'} NO RECORDS FOUND
                 </div>
               ) : data.premkuOrders.map((o) => (
                 <div key={o._id} className="bg-zinc-900 border border-zinc-800 hover:border-red-500/50 p-4 relative group transition-colors overflow-hidden">
@@ -188,7 +188,7 @@ export default function HistoryPage() {
                     </div>
                     <button onClick={() => checkPremkuOrder(o.invoice)}
                       className="text-xs font-mono uppercase tracking-widest flex items-center justify-center gap-2 bg-zinc-950 hover:bg-zinc-800 border border-zinc-700 text-zinc-300 px-4 py-2 transition-colors sm:w-auto w-full">
-                      <RefreshCw size={14} /> Ping
+                      <RefreshCw size={14} /> REFRESH 
                     </button>
                   </div>
                 </div>
@@ -199,7 +199,7 @@ export default function HistoryPage() {
             {tab === 'nokos-orders' && (
               data.nokosOrders.length === 0 ? (
                 <div className="border border-dashed border-zinc-800 bg-zinc-900/30 text-center py-12 font-mono text-zinc-500 uppercase text-xs tracking-widest">
-                  {'>>'} NO_RECORDS_FOUND
+                  {'>>'} NO RECORDS FOUND
                 </div>
               ) : data.nokosOrders.map((o) => (
                 <div key={o._id} className="bg-zinc-900 border border-zinc-800 hover:border-blue-500/50 p-4 relative group transition-colors overflow-hidden">
@@ -218,7 +218,7 @@ export default function HistoryPage() {
                     <div className="flex flex-row sm:flex-col gap-2 w-full sm:w-auto">
                       <button onClick={() => checkNokosOrder(o.orderId)}
                         className="flex-1 sm:flex-none text-xs font-mono uppercase tracking-widest flex items-center justify-center gap-2 bg-zinc-950 hover:bg-zinc-800 border border-zinc-700 text-zinc-300 px-4 py-2 transition-colors">
-                        <RefreshCw size={14} /> Ping
+                        <RefreshCw size={14} /> REFRESH
                       </button>
                       {o.status === 'active' && (
                         <button onClick={() => cancelNokosOrder(o.orderId)}
@@ -236,13 +236,13 @@ export default function HistoryPage() {
             {tab === 'premku-deposits' && (
               data.premkuDeposits.length === 0 ? (
                 <div className="border border-dashed border-zinc-800 bg-zinc-900/30 text-center py-12 font-mono text-zinc-500 uppercase text-xs tracking-widest">
-                  {'>>'} NO_RECORDS_FOUND
+                  {'>>'} NO RECORDS FOUND
                 </div>
               ) : data.premkuDeposits.map((d) => (
                 <div key={d._id} className="bg-zinc-900 border border-zinc-800 hover:border-red-500/50 p-4 relative transition-colors">
                   <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                     <div>
-                      <p className="font-bold text-white uppercase text-sm mb-1 flex items-center gap-2"><CreditCard size={14} className="text-red-500" /> Premku_Funds_Inject</p>
+                      <p className="font-bold text-white uppercase text-sm mb-1 flex items-center gap-2"><CreditCard size={14} className="text-red-500" /> Premku</p>
                       <p className="text-xs font-mono text-zinc-500 mb-3">ID: {d.invoice}</p>
                       <div className="flex items-center gap-3 flex-wrap">
                         <StatusBadge status={d.status} />
@@ -256,7 +256,7 @@ export default function HistoryPage() {
                     <div className="flex flex-row sm:flex-col gap-2 w-full sm:w-auto mt-2 sm:mt-0">
                       <button onClick={() => checkPremkuDeposit(d.invoice)}
                         className="flex-1 sm:flex-none text-xs font-mono uppercase flex items-center justify-center gap-2 bg-zinc-950 hover:bg-zinc-800 border border-zinc-700 text-zinc-300 px-4 py-2 transition-colors">
-                        <RefreshCw size={14} /> Ping
+                        <RefreshCw size={14} /> REFRESH
                       </button>
                       {d.status === 'pending' && (
                         <button onClick={() => cancelPremkuDeposit(d.invoice)} 
@@ -274,13 +274,13 @@ export default function HistoryPage() {
             {tab === 'nokos-deposits' && (
               data.nokosDeposits.length === 0 ? (
                 <div className="border border-dashed border-zinc-800 bg-zinc-900/30 text-center py-12 font-mono text-zinc-500 uppercase text-xs tracking-widest">
-                  {'>>'} NO_RECORDS_FOUND
+                  {'>>'} NO RECORDS FOUND
                 </div>
               ) : data.nokosDeposits.map((d) => (
                 <div key={d._id} className="bg-zinc-900 border border-zinc-800 hover:border-blue-500/50 p-4 relative transition-colors">
                   <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                     <div>
-                      <p className="font-bold text-white uppercase text-sm mb-1 flex items-center gap-2"><CreditCard size={14} className="text-blue-500" /> Nokos_Funds_Inject</p>
+                      <p className="font-bold text-white uppercase text-sm mb-1 flex items-center gap-2"><CreditCard size={14} className="text-blue-500" /> Nokos</p>
                       <p className="text-xs font-mono text-zinc-500 mb-3">ID: {d.depositId}</p>
                       <div className="flex items-center gap-3 flex-wrap">
                         <StatusBadge status={d.status} />
