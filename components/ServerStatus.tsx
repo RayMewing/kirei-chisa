@@ -26,31 +26,51 @@ export default function ServerStatus() {
     return () => clearInterval(t);
   }, []);
 
-  const colors = {
-    checking: 'text-gray-500 bg-gray-100',
-    online: 'text-green-600 bg-green-50',
-    slow: 'text-yellow-600 bg-yellow-50',
-    offline: 'text-red-600 bg-red-50',
+  const theme = {
+    checking: 'text-zinc-500 border-zinc-800 bg-zinc-950',
+    online: 'text-emerald-500 border-emerald-900/50 bg-emerald-950/30 drop-shadow-[0_0_5px_rgba(16,185,129,0.3)]',
+    slow: 'text-amber-500 border-amber-900/50 bg-amber-950/30 drop-shadow-[0_0_5px_rgba(245,158,11,0.3)]',
+    offline: 'text-red-500 border-red-900/50 bg-red-950/30 drop-shadow-[0_0_5px_rgba(220,38,38,0.3)]',
   };
+
   const dots = {
-    checking: 'bg-gray-400 animate-pulse',
-    online: 'bg-green-500 animate-pulse',
-    slow: 'bg-yellow-500 animate-pulse',
+    checking: 'bg-zinc-500 animate-ping opacity-70',
+    online: 'bg-emerald-500 animate-pulse',
+    slow: 'bg-amber-500 animate-pulse',
     offline: 'bg-red-500',
   };
+
+  const coreDots = {
+    checking: 'bg-zinc-500',
+    online: 'bg-emerald-500',
+    slow: 'bg-amber-500',
+    offline: 'bg-red-500',
+  };
+
   const labels = {
-    checking: 'Mengecek...',
-    online: 'Server Online',
-    slow: 'Server Lambat',
-    offline: 'Server Offline',
+    checking: 'PINGING...',
+    online: 'ONLINE',
+    slow: 'HIGH LATENCY',
+    offline: 'OFFLINE',
   };
 
   return (
-    <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium ${colors[status]}`}>
-      <span className={`w-2 h-2 rounded-full ${dots[status]}`} />
-      <Activity size={11} />
-      <span>{labels[status]}</span>
-      {ms !== null && <span className="opacity-70">• {ms}ms</span>}
+    <div className={`inline-flex items-center gap-2.5 px-3 py-1.5 border font-mono text-[10px] uppercase tracking-widest transition-all duration-300 ${theme[status]}`}>
+      {/* Blinking Dot Indicator */}
+      <div className="relative flex items-center justify-center w-2 h-2">
+        <span className={`absolute inset-0 rounded-full ${dots[status]}`} />
+        <span className={`relative w-1.5 h-1.5 rounded-full ${coreDots[status]}`} />
+      </div>
+      
+      <Activity size={12} className={status === 'checking' ? 'animate-pulse' : ''} />
+      
+      <span className="font-bold">{labels[status]}</span>
+      
+      {ms !== null && (
+        <span className="opacity-80 ml-1 border-l border-current pl-2.5">
+          {ms}ms
+        </span>
+      )}
     </div>
   );
 }
