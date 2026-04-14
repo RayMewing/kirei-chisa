@@ -20,7 +20,7 @@ export default function HomePage() {
             <div className="flex items-center gap-3">
               <span className="w-3 h-3 bg-red-500 animate-pulse shadow-[0_0_10px_rgba(239,68,68,0.8)]"></span>
               <h2 className="text-xs font-mono font-bold text-red-500 tracking-[0.2em] uppercase">
-                Sys.Online // Kirei_Chisa // V1.0.2
+                Online // Kirei Chisa // V1.0
               </h2>
             </div>
             <ServerStatus />
@@ -74,7 +74,7 @@ export default function HomePage() {
               </div>
 
               <p className="text-zinc-300 text-xs sm:text-sm font-mono mb-8 border-l-2 border-red-600 pl-4 bg-zinc-950/60 p-4 backdrop-blur-md shadow-lg text-left max-w-lg w-full">
-                <span className="text-red-500 font-bold">[{'>'} DATA_LINK_ESTABLISHED]</span> <br/><br/>
+                <span className="text-red-500 font-bold">[{'>'} ABOUT THE WEBSITE ]</span> <br/><br/>
                 Platform jual beli akun premium, OTP virtual, dan Top-Up PPOB terlengkap. 
                 Transaksi cepat, aman, 24/7 otomatis.
               </p>
