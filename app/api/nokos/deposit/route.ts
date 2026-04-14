@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
     if (!authUser) return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
 
     const { amount } = await req.json();
-    if (!amount || amount < 10000) return NextResponse.json({ success: false, message: 'Minimum deposit Rp10.000.' }, { status: 400 });
+    if (!amount || amount < 1000) return NextResponse.json({ success: false, message: 'Minimum deposit Rp1.000.' }, { status: 400 });
 
     await connectDB();
     const user = await User.findById(authUser.userId);

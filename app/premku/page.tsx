@@ -6,17 +6,16 @@ import toast from 'react-hot-toast';
 import { ShoppingBag, Search, Package, CheckCircle, XCircle, RefreshCw, X, Copy, Crosshair, TerminalSquare } from 'lucide-react';
 import { extractCategory, formatRupiah } from '@/lib/utils';
 
-// Tipe produk gabungan (API + Custom)
 interface Product {
-  id?: number;           // untuk produk API premku
-  _id?: string;          // untuk produk custom DB
+  id?: number;
+  _id?: string;
   name: string;
   description?: string;
   price: number;
   status?: 'available' | 'unavailable';
   stock: number;
-  image?: string;        // URL gambar produk API
-  imageBase64?: string;  // base64 gambar produk custom
+  image?: string;
+  imageBase64?: string;
   category?: string;
   source: 'api' | 'custom';
 }
@@ -38,7 +37,6 @@ export default function PremkuPage() {
   const fetchProducts = useCallback(async () => {
     setLoading(true);
     try {
-      // Fetch API products + custom products secara paralel
       const [apiRes, customRes] = await Promise.all([
         fetch('/api/premku/products'),
         fetch('/api/premku/custom-products'),
@@ -62,10 +60,8 @@ export default function PremkuPage() {
           }))
         : [];
 
-      // Custom produk muncul duluan
       setProducts([...customProducts, ...apiProducts]);
-    } catch (err) {
-      console.error('Fetch products error:', err);
+    } catch {
       toast.error('Gagal memuat produk.');
     } finally {
       setLoading(false);
@@ -82,14 +78,12 @@ export default function PremkuPage() {
     return matchCat && matchSearch;
   });
 
-  // Key unik per produk (beda antara API dan custom)
   const productKey = (p: Product) => p.source === 'custom' ? `custom-${p._id}` : `api-${p.id}`;
 
   const handleOrder = async (product: Product) => {
     const key = productKey(product);
     setOrdering(key);
     try {
-      // Satu endpoint untuk keduanya, tapi kirim flag isCustom
       const res = await fetch('/api/premku/order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -108,7 +102,6 @@ export default function PremkuPage() {
       }
       toast.success('Pesanan berhasil dibuat!');
       setOrderResult(data.order);
-      // Refresh stok setelah beli custom product
       if (product.source === 'custom') fetchProducts();
     } finally {
       setOrdering(null);
@@ -126,16 +119,16 @@ export default function PremkuPage() {
       const data = await res.json();
       if (data.success) {
         setOrderResult(prev => prev ? { ...prev, status: data.order.status, accounts: data.order.accounts } : prev);
-        if (data.order.status === 'success') toast.success('Pesanan sukses!');
+        if (data.order.status === 'success') toast.success('Pesanan berhasil!');
         else toast(`Status: ${data.order.status}`);
       }
     } finally { setCheckingStatus(false); }
   };
 
   const statusBadge = (status: string) => {
-    if (status === 'success') return <span className="badge-success"><CheckCircle size={11} />Sukses</span>;
+    if (status === 'success') return <span className="badge-success"><CheckCircle size={11} />Berhasil</span>;
     if (status === 'failed') return <span className="badge-failed"><XCircle size={11} />Gagal</span>;
-    return <span className="badge-pending">Pending</span>;
+    return <span className="badge-pending">Diproses</span>;
   };
 
   return (
@@ -145,14 +138,15 @@ export default function PremkuPage() {
       <Navbar />
       <main className="pt-24 max-w-5xl mx-auto px-4 sm:px-6 py-8 relative z-10">
 
+        {/* Header */}
         <div className="mb-8 border-b border-zinc-800 pb-4">
           <div className="flex items-center gap-3 mb-1">
             <Crosshair className="text-red-500 animate-[spin_4s_linear_infinite]" size={28} />
             <h1 className="text-3xl font-black text-white uppercase tracking-tight" style={{ textShadow: '2px 2px 0px #dc2626' }}>
-              Premku_DB
+              Premku
             </h1>
           </div>
-          <p className="text-red-500 font-mono text-xs pl-10">{'>>'} Premium node access index_</p>
+          <p className="text-red-500 font-mono text-xs pl-10">{'>>'} Akun premium digital tersedia di sini</p>
         </div>
 
         {/* Search */}
@@ -161,7 +155,7 @@ export default function PremkuPage() {
           <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-red-500/70" />
           <input
             className="input pl-11 bg-zinc-950/80 backdrop-blur-sm border-zinc-800/80 focus:border-red-600 focus:shadow-[0_0_15px_rgba(220,38,38,0.2)] text-white"
-            placeholder="Search module..."
+            placeholder="Cari produk..."
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
@@ -182,7 +176,7 @@ export default function PremkuPage() {
           ))}
         </div>
 
-        {/* Products Grid */}
+        {/* Products */}
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[...Array(6)].map((_, i) => (
@@ -192,43 +186,35 @@ export default function PremkuPage() {
         ) : filtered.length === 0 ? (
           <div className="text-center py-16 border border-dashed border-zinc-800 bg-zinc-900/30">
             <Package size={40} className="mx-auto text-zinc-600 mb-3" />
-            <p className="text-zinc-500 font-mono text-sm uppercase">{'>>'} DATA_NOT_FOUND</p>
+            <p className="text-zinc-500 font-mono text-sm uppercase">{'>>'} Produk tidak ditemukan</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {filtered.map(product => {
               const key = productKey(product);
-              const isAvailable = product.source === 'custom'
-                ? product.stock > 0
-                : product.status === 'available';
-              // Gambar produk: custom pakai base64, API pakai URL
+              const isAvailable = product.source === 'custom' ? product.stock > 0 : product.status === 'available';
               const imgSrc = product.source === 'custom' ? product.imageBase64 : product.image;
 
               return (
                 <div key={key} className="card-product group flex flex-col h-full">
-                  {/* Image */}
                   <div className="w-full h-28 bg-zinc-950 border border-zinc-800/80 mb-3 flex items-center justify-center overflow-hidden relative group-hover:border-red-500/30 transition-colors">
                     <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0)_50%,rgba(0,0,0,0.2)_50%)] bg-[length:100%_4px] z-10 pointer-events-none opacity-50" />
                     {imgSrc ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={imgSrc}
-                        alt={product.name}
-                        className="absolute inset-0 w-full h-full object-contain p-2 grayscale-[30%] group-hover:grayscale-0 transition-all z-0"
-                      />
+                      <img src={imgSrc} alt={product.name}
+                        className="absolute inset-0 w-full h-full object-contain p-2 grayscale-[30%] group-hover:grayscale-0 transition-all z-0" />
                     ) : (
                       <ShoppingBag size={32} className="text-zinc-700" />
                     )}
                   </div>
 
-                  {/* Badge: custom vs api */}
                   <div className="flex items-center gap-2 mb-1.5">
                     <span className="text-[10px] font-mono font-bold text-red-500 bg-red-950/30 border border-red-900/50 px-2 py-0.5 uppercase tracking-widest">
                       {product.category}
                     </span>
                     {product.source === 'custom' && (
                       <span className="text-[10px] font-mono font-bold text-emerald-500 bg-emerald-950/30 border border-emerald-900/50 px-2 py-0.5 uppercase tracking-widest">
-                        Lokal
+                        Tersedia
                       </span>
                     )}
                   </div>
@@ -245,17 +231,15 @@ export default function PremkuPage() {
 
                   <div className="flex items-end justify-between mt-auto pt-4 border-t border-zinc-800/50 mb-4">
                     <div>
-                      <span className="block text-[10px] text-zinc-500 font-mono uppercase mb-0.5">Cost</span>
+                      <span className="block text-[10px] text-zinc-500 font-mono uppercase mb-0.5">Harga</span>
                       <span className="font-bold text-red-500 text-lg tracking-wider drop-shadow-[0_0_5px_rgba(220,38,38,0.5)]">
                         {formatRupiah(product.price)}
                       </span>
                     </div>
                     {isAvailable ? (
-                      <span className="badge-active text-xs">
-                        Stok: {product.stock > 999 ? '999+' : product.stock}
-                      </span>
+                      <span className="badge-active">Stok: {product.stock > 999 ? '999+' : product.stock}</span>
                     ) : (
-                      <span className="badge-failed text-xs">Habis</span>
+                      <span className="badge-failed">Habis</span>
                     )}
                   </div>
 
@@ -267,7 +251,7 @@ export default function PremkuPage() {
                         ? 'bg-zinc-900 border border-zinc-800 text-zinc-600 cursor-not-allowed'
                         : 'bg-red-600 border border-red-500 text-white hover:bg-red-500 hover:shadow-[0_0_15px_rgba(220,38,38,0.5)]'
                     }`}>
-                    {ordering === key ? <span className="spinner border-white/30 border-t-white" /> : 'Execute'}
+                    {ordering === key ? <span className="spinner border-white/30 border-t-white" /> : 'Beli Sekarang'}
                   </button>
                 </div>
               );
@@ -285,25 +269,25 @@ export default function PremkuPage() {
 
               <div className="relative z-10">
                 <div className="flex items-center justify-between mb-6 border-b border-red-900/50 pb-3">
-                  <h3 className="font-black font-mono text-white text-lg uppercase tracking-widest">System_Log</h3>
+                  <h3 className="font-black font-mono text-white text-lg uppercase tracking-widest">Detail Pesanan</h3>
                   <button onClick={() => setOrderResult(null)} className="text-zinc-500 hover:text-red-500 transition-colors"><X size={20} /></button>
                 </div>
 
                 <div className="bg-zinc-950 border border-zinc-800 p-4 mb-4 space-y-3 text-xs font-mono">
                   <div className="flex justify-between items-center border-b border-zinc-800/50 pb-2">
-                    <span className="text-zinc-500 uppercase">Module</span>
+                    <span className="text-zinc-500 uppercase">Produk</span>
                     <span className="font-bold text-white text-right max-w-[60%]">{orderResult.productName}</span>
                   </div>
                   <div className="flex justify-between items-center border-b border-zinc-800/50 pb-2">
-                    <span className="text-zinc-500 uppercase">ID</span>
+                    <span className="text-zinc-500 uppercase">Invoice</span>
                     <span className="text-red-400">{orderResult.invoice}</span>
                   </div>
                   <div className="flex justify-between items-center border-b border-zinc-800/50 pb-2">
-                    <span className="text-zinc-500 uppercase">Cost</span>
+                    <span className="text-zinc-500 uppercase">Total</span>
                     <span className="font-bold text-red-500">{formatRupiah(orderResult.total)}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-zinc-500 uppercase">State</span>
+                    <span className="text-zinc-500 uppercase">Status</span>
                     {statusBadge(orderResult.status)}
                   </div>
                 </div>
@@ -311,25 +295,25 @@ export default function PremkuPage() {
                 {orderResult.status === 'success' && orderResult.accounts && orderResult.accounts.length > 0 && (
                   <div className="mb-6">
                     <p className="text-xs font-mono font-bold text-emerald-500 mb-2 uppercase tracking-widest flex items-center gap-2">
-                      <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" /> Decrypted_Data:
+                      <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" /> Data Akun:
                     </p>
                     {orderResult.accounts.map((acc, i) => (
                       <div key={i} className="bg-emerald-950/20 border border-emerald-900/50 p-3 text-xs font-mono space-y-2 mb-2">
                         <div className="flex items-center justify-between">
-                          <span className="text-emerald-600/70">ID: <span className="font-bold text-emerald-400 ml-1">{acc.username}</span></span>
-                          <button onClick={() => { navigator.clipboard.writeText(acc.username); toast.success('Copied!'); }}>
+                          <span className="text-emerald-600/70">Email: <span className="font-bold text-emerald-400 ml-1">{acc.username}</span></span>
+                          <button onClick={() => { navigator.clipboard.writeText(acc.username); toast.success('Disalin!'); }}>
                             <Copy size={13} className="text-emerald-600 hover:text-emerald-400" />
                           </button>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="text-emerald-600/70">KEY: <span className="font-bold text-emerald-400 ml-1">{acc.password}</span></span>
-                          <button onClick={() => { navigator.clipboard.writeText(acc.password); toast.success('Copied!'); }}>
+                          <span className="text-emerald-600/70">Sandi: <span className="font-bold text-emerald-400 ml-1">{acc.password}</span></span>
+                          <button onClick={() => { navigator.clipboard.writeText(acc.password); toast.success('Disalin!'); }}>
                             <Copy size={13} className="text-emerald-600 hover:text-emerald-400" />
                           </button>
                         </div>
                         {acc.notes && (
                           <p className="text-emerald-700/60 border-t border-emerald-900/30 pt-1.5">
-                            Note: {acc.notes}
+                            Catatan: {acc.notes}
                           </p>
                         )}
                       </div>
@@ -343,7 +327,7 @@ export default function PremkuPage() {
                   className="btn-secondary w-full py-3 text-xs">
                   {checkingStatus
                     ? <span className="spinner border-red-500/30 border-t-red-500" />
-                    : <><RefreshCw size={14} /> Ping_Server</>
+                    : <><RefreshCw size={14} /> Cek Status Pesanan</>
                   }
                 </button>
               </div>
