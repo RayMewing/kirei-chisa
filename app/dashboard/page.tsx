@@ -93,7 +93,7 @@ export default function DashboardPage() {
             <div className="flex items-center gap-3 mb-1">
               <Crosshair className="text-red-500 animate-[spin_4s_linear_infinite]" size={28} />
               <h1 className="text-3xl font-black text-white uppercase tracking-tight" style={{ textShadow: '2px 2px 0px #dc2626' }}>
-                User_Dashboard
+                User Dashboard
               </h1>
             </div>
             <p className="text-zinc-400 font-mono text-xs pl-10">
@@ -111,13 +111,13 @@ export default function DashboardPage() {
             <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-red-500"></div>
             
             <p className="text-xs text-zinc-400 font-mono uppercase tracking-widest mb-2 flex items-center gap-2">
-              <ShoppingBag size={14} className="text-red-500" /> Premku_Credits
+              <ShoppingBag size={14} className="text-red-500" /> Premku Credits
             </p>
             <p className="text-3xl font-black text-white drop-shadow-[0_0_8px_rgba(220,38,38,0.5)] mb-4">
               {user ? formatRupiah(user.premkuBalance) : '—'}
             </p>
             <Link href="/deposit?type=premku" className="inline-flex items-center gap-2 text-xs font-mono font-bold bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white border border-red-500/50 hover:border-red-500 px-4 py-2 uppercase tracking-wide transition-all">
-              <CreditCard size={14} /> Inject_Funds
+              <CreditCard size={14} /> Deposit
             </Link>
           </div>
 
@@ -127,13 +127,13 @@ export default function DashboardPage() {
             <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-white/50"></div>
             
             <p className="text-xs text-zinc-400 font-mono uppercase tracking-widest mb-2 flex items-center gap-2">
-              <Phone size={14} className="text-white" /> Nokos_Credits
+              <Phone size={14} className="text-white" /> Nokos Credits
             </p>
             <p className="text-3xl font-black text-white mb-4">
               {user ? formatRupiah(user.nokosBalance) : '—'}
             </p>
             <Link href="/deposit?type=nokos" className="inline-flex items-center gap-2 text-xs font-mono font-bold bg-white/5 text-white hover:bg-white hover:text-zinc-950 border border-white/20 hover:border-white px-4 py-2 uppercase tracking-wide transition-all">
-              <CreditCard size={14} /> Inject_Funds
+              <CreditCard size={14} /> Deposit
             </Link>
           </div>
         </div>
@@ -157,7 +157,7 @@ export default function DashboardPage() {
           <div className="mb-8">
             <h2 className="text-lg font-black text-white uppercase tracking-widest mb-4 flex items-center gap-3 border-b border-zinc-800 pb-2">
               <Zap size={20} className="text-red-500" />
-              Active_Nodes
+              Active Orders
               <span className="bg-red-600/20 border border-red-500/50 text-red-500 font-mono text-xs px-2 py-0.5">{nokosActive.length}</span>
             </h2>
             <div className="space-y-4">
@@ -178,7 +178,7 @@ export default function DashboardPage() {
                       <div className="flex sm:flex-col gap-2 w-full sm:w-auto mt-2 sm:mt-0">
                         <button onClick={() => checkNokosStatus(order.orderId)}
                           className="flex-1 sm:flex-none flex items-center justify-center gap-2 text-xs font-mono font-bold bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-700 px-4 py-2 transition-colors uppercase">
-                          <RefreshCw size={14} /> Ping
+                          <RefreshCw size={14} /> REFRESH
                         </button>
                         {canCancel && (
                           <button onClick={() => cancelNokos(order.orderId)}
